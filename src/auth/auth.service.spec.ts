@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { UsersRepository } from './users.repository';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { NotFoundException } from '@nestjs/common';
 
 const mockUsersRepository = () => ({
   findOne: jest.fn(),
@@ -47,6 +48,24 @@ describe('AuthService', () => {
     it('Error Case for Registering New User', async () => {
       usersRepository.register.mockResolvedValue(null);
       expect(authService.register(null)).rejects.toThrow(TypeError);
+    });
+  });
+  describe('Login', () => {
+    it('Calls Login method and authenticates user', async () => {
+      const username = 'adamcmack';
+      usersRepository.findOne.mockResolvedValue(username);
+      const user = await usersRepository.findOne({ username });
+      expect(usersRepository.findOne).toHaveBeenCalled();
+      expect(user).toBeDefined();
+    });
+    it('Case of null user value', async () => {
+      const username = null;
+      usersRepository.findOne.mockResolvedValue(null);
+      const user = await usersRepository.findOne({ username });
+      expect(user).toBe(null);
+      expect(usersRepository.findOne(username)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });
