@@ -5,6 +5,7 @@ import { PicksModule } from './picks/picks.module';
 
 @Module({
   imports: [
+    PicksModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -16,7 +17,6 @@ import { PicksModule } from './picks/picks.module';
       synchronize: true,
     }),
     AuthModule,
-    PicksModule,
   ],
 })
 export class AppModule {}
