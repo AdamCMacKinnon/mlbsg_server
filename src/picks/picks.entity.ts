@@ -1,4 +1,10 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Picks {
@@ -10,4 +16,10 @@ export class Picks {
 
   @Column({ array: true })
   picks: string;
+
+  @CreateDateColumn({ type: 'timestamp', precision: 3 })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', precision: 3 })
+  updatedAt: Date;
 }
