@@ -1,7 +1,11 @@
+import { Exclude } from 'class-transformer';
+import { User } from 'src/auth/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -22,4 +26,9 @@ export class Picks {
 
   @UpdateDateColumn({ type: 'timestamp', precision: 3 })
   updatedAt: Date;
+
+  @OneToOne(() => User, { nullable: false })
+  @Exclude({ toPlainOnly: true })
+  @JoinColumn({ name: 'userid' })
+  user: User;
 }

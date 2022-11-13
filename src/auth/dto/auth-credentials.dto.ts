@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import {
   IsBoolean,
   IsDateString,
@@ -11,8 +12,7 @@ import {
 } from 'class-validator';
 
 export class AuthCredentialsDto {
-  @IsString()
-  @IsUUID()
+  @Expose()
   id: string;
 
   @IsString()
