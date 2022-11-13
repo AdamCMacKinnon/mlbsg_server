@@ -1,4 +1,4 @@
-import { Picks } from 'src/picks/picks.entity';
+import { Picks } from '../picks/picks.entity';
 import {
   Column,
   CreateDateColumn,
