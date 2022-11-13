@@ -1,7 +1,9 @@
+import { Picks } from '../picks/picks.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -37,4 +39,7 @@ export class User {
 
   @UpdateDateColumn({ type: 'timestamp', precision: 3 })
   updatedAt: Date;
+
+  @OneToOne((_type) => Picks, (pick) => pick.user, { eager: true })
+  picks: Picks[];
 }

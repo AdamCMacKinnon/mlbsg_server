@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from 'src/auth/auth.module';
+import { AuthModule } from '../auth/auth.module';
 import { PicksController } from './picks.controller';
 import { PicksRepository } from './picks.repository';
 import { PicksService } from './picks.service';
