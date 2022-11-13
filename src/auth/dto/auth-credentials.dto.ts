@@ -4,12 +4,17 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
 export class AuthCredentialsDto {
+  @IsString()
+  @IsUUID()
+  id: string;
+
   @IsString()
   @MinLength(8)
   @MaxLength(20)
