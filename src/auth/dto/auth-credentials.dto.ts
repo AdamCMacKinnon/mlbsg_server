@@ -1,15 +1,20 @@
+import { Expose } from 'class-transformer';
 import {
   IsBoolean,
   IsDateString,
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Matches,
   MaxLength,
   MinLength,
 } from 'class-validator';
 
 export class AuthCredentialsDto {
+  @Expose()
+  id: string;
+
   @IsString()
   @MinLength(8)
   @MaxLength(20)
