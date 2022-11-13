@@ -21,8 +21,10 @@ export class AuthService {
   async login(
     authCredentialsDto: AuthCredentialsDto,
   ): Promise<{ accessToken: string }> {
-    const { id, username, password } = authCredentialsDto;
+    const { username, password } = authCredentialsDto;
+    let { id } = authCredentialsDto;
     const user = await this.usersRepository.findOne({ username });
+    id = user.id;
     console.log(user);
     if (user && (await bcrypt.compare(password, user.password))) {
       const payload: JwtPayload = { id };
