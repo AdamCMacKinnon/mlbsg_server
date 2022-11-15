@@ -22,12 +22,6 @@ export class PicksService {
     return [picksList];
   }
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
-    const { username, picks } = makePicksDto;
-    const userPick = this.picksRepository.create({
-      username,
-      picks: [picks],
-    });
-    await this.picksRepository.save(userPick);
     return this.picksRepository.makePicks(makePicksDto, user);
   }
 }
