@@ -1,34 +1,19 @@
 import { User } from '../auth/user.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
 @Entity()
 export class Picks {
-  @PrimaryColumn()
-  userid: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
-  username: string;
+  week: number;
 
-  @Column('character varying', { array: true, default: [] })
-  picks: string[];
+  @Column()
+  pick: string;
 
-  @CreateDateColumn({ type: 'timestamp', precision: 3 })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamp', precision: 3 })
-  updatedAt: Date;
-
-  @OneToOne(() => User, { nullable: false })
+  @ManyToOne((_type) => User, (user) => user.picks, { eager: false })
   @Exclude({ toPlainOnly: true })
-  @JoinColumn({ name: 'userid' })
   user: User;
 }

@@ -1,4 +1,4 @@
 export class MakePicksDto {
-  username: string;
-  picks: string;
+  week: number;
+  pick: string;
 }

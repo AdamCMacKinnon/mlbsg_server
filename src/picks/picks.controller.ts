@@ -1,12 +1,5 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
 import { User } from '../auth/user.entity';
 import { Picks } from '../picks/picks.entity';
@@ -14,6 +7,7 @@ import { MakePicksDto } from './dto/make-picks.dto';
 import { PicksService } from './picks.service';
 
 @Controller('picks')
+@UseGuards(AuthGuard())
 export class PicksController {
   constructor(private picksService: PicksService) {}
 
@@ -22,7 +16,6 @@ export class PicksController {
     return this.picksService.getUserPicks(userid);
   }
   @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
   makePicks(
     @Body() makePicksDto: MakePicksDto,
     @GetUser() user: User,
