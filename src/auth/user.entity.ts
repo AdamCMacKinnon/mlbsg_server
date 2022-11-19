@@ -42,4 +42,5 @@ export class User {
 
   @OneToMany((_type) => Picks, (pick) => pick.user, { eager: true })
   picks: Picks[];
+  user: Picks;
 }

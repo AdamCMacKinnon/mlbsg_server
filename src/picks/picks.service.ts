@@ -11,13 +11,15 @@ export class PicksService {
     @InjectRepository(PicksRepository)
     private picksRepository: PicksRepository,
   ) {}
-  async getUserPicks(userid: string): Promise<Picks[]> {
+  async getUserPicks(user: User): Promise<Picks[]> {
+    // eslint-disable-next-line prefer-const
+    let { id } = user;
     const picksList = await this.picksRepository.findOne({
-      where: { userid },
+      where: { user },
     });
-
+    id = user.id;
     if (!picksList) {
-      throw new NotFoundException(`No picks for user ${userid}`);
+      throw new NotFoundException(`No picks for user ${id} `);
     }
     return [picksList];
   }

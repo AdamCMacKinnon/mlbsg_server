@@ -11,9 +11,9 @@ import { PicksService } from './picks.service';
 export class PicksController {
   constructor(private picksService: PicksService) {}
 
-  @Get('/getPick/:userid')
-  getUserPicks(@Param('userid') userid: string): Promise<Picks[]> {
-    return this.picksService.getUserPicks(userid);
+  @Get('/getPick/:id')
+  getUserPicks(@Param('id') user: User): Promise<Picks[]> {
+    return this.picksService.getUserPicks(user);
   }
   @Post()
   makePicks(

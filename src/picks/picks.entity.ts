@@ -1,5 +1,12 @@
 import { User } from '../auth/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
 
 @Entity()
@@ -12,6 +19,12 @@ export class Picks {
 
   @Column()
   pick: string;
+
+  @CreateDateColumn({ type: 'timestamp', precision: 3 })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', precision: 3 })
+  updatedAt: Date;
 
   @ManyToOne((_type) => User, (user) => user.picks, { eager: false })
   @Exclude({ toPlainOnly: true })
