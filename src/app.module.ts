@@ -15,6 +15,7 @@ import { PicksModule } from './picks/picks.module';
       database: process.env.DB_NAME,
       autoLoadEntities: true,
       synchronize: true,
+      logging: true,
     }),
     AuthModule,
   ],
