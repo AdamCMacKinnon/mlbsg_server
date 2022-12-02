@@ -7,6 +7,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
+import { GetUsersFilterDto } from 'src/admin/dto/get-users-filter.dto';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -48,6 +49,15 @@ export class UsersRepository extends Repository<User> {
       } else {
         throw new InternalServerErrorException(error);
       }
+    }
+  }
+  async allUsers(filterDto: GetUsersFilterDto, user: User): Promise<User[]> {
+    const { isactive } = filterDto;
+    const userObj = this.createQueryBuilder('user');
+    userObj.where({ user });
+
+    if (isactive === true) {
+      return [user];
     }
   }
 }
