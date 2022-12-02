@@ -2,16 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../auth/user.entity';
 import { UsersRepository } from '../auth/users.repository';
-import { Picks } from '../picks/picks.entity';
-import { PicksRepository } from '../picks/picks.repository';
 
 @Injectable()
 export class AdminService {
   constructor(
     @InjectRepository(User)
     private usersRepository: UsersRepository,
-    @InjectRepository(Picks)
-    private picksRepository: PicksRepository,
   ) {}
   async getUsers(): Promise<User[]> {
     const users = await this.usersRepository.find({

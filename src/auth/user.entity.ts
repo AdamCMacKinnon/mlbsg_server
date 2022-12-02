@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class User {
@@ -16,9 +17,11 @@ export class User {
   @Column({ unique: true })
   username: string;
 
+  @Exclude({ toPlainOnly: true })
   @Column()
   password: string;
 
+  @Exclude({ toPlainOnly: true })
   @Column()
   email: string;
 
@@ -28,15 +31,18 @@ export class User {
   @Column({ default: false })
   admin: boolean;
 
+  @Exclude({ toPlainOnly: true })
   @Column({ default: false })
   pastchamp: boolean;
 
   @Column({ default: 0 })
   diff: number;
 
+  @Exclude({ toPlainOnly: true })
   @CreateDateColumn({ type: 'timestamp', precision: 3 })
   createdAt: Date;
 
+  @Exclude({ toPlainOnly: true })
   @UpdateDateColumn({ type: 'timestamp', precision: 3 })
   updatedAt: Date;
 
