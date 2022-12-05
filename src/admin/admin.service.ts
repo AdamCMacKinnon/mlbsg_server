@@ -11,8 +11,9 @@ export class AdminService {
   ) {}
   async getUsers(): Promise<User[]> {
     const users = await this.usersRepository.find({
-      // So I feel like this is the easiest way to query this and just get the whole user object
-      // problem is that you get the WHOLE thing.  Need to serialize?
+      // TODO:  Streamline by making a new Repository in Admin for that specific use case
+      // Right now, we're modifying the user object, albeit with data that would not be needed anywhere else, but still.
+      // From a scalability perspective, response is probably too verbose.
       where: {
         isactive: true,
       },
