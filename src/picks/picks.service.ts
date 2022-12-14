@@ -14,14 +14,14 @@ export class PicksService {
   async getUserPicks(user: User): Promise<Picks[]> {
     // eslint-disable-next-line prefer-const
     let { id } = user;
-    const picksList = await this.picksRepository.findOne({
+    const picksList = await this.picksRepository.find({
       where: { user },
     });
     id = user.id;
     if (!picksList) {
       throw new NotFoundException(`No picks for user ${id} `);
     }
-    return [picksList];
+    return picksList;
   }
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
     return this.picksRepository.makePicks(makePicksDto, user);
