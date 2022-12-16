@@ -45,10 +45,6 @@ describe('AuthService', () => {
       expect(usersRepository.register).toHaveBeenCalled();
       expect(result).toEqual(mockUser);
     });
-    it('Error Case for Registering New User', async () => {
-      usersRepository.register.mockResolvedValue(null);
-      expect(authService.register(null)).rejects.toThrow(TypeError);
-    });
   });
   describe('Login', () => {
     it('Calls Login method and authenticates user', async () => {
