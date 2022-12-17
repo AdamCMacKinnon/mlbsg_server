@@ -46,6 +46,7 @@ export class User {
   @UpdateDateColumn({ type: 'timestamp', precision: 3 })
   updatedAt: Date;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Picks, (pick) => pick.user, { eager: true })
   picks: Picks[];
   user: Picks;
