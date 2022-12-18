@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/auth/user.entity';
 import { AdminService } from './admin.service';
@@ -11,5 +11,12 @@ export class AdminController {
   @Get('/users')
   getUsers(): Promise<User[]> {
     return this.adminService.getUsers();
+  }
+  @Patch('/eliminate')
+  elimUsers(
+    @Body('username')
+    usernames: string[],
+  ) {
+    return this.adminService.elimByUsername(usernames);
   }
 }
