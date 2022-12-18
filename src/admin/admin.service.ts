@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { In } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { UsersRepository } from '../auth/users.repository';
 
@@ -19,5 +20,14 @@ export class AdminService {
       },
     });
     return users;
+  }
+  async elimByUsername(usernames: string[]) {
+    const updateStatus = await this.usersRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ isactive: true })
+      .where({ username: In(usernames) })
+      .execute();
+    return updateStatus;
   }
 }
