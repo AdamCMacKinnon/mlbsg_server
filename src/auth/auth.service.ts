@@ -1,13 +1,21 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { UsersRepository } from './users.repository';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
+import { UserUpdateDto } from './dto/user-update.dto';
+import { User } from './user.entity';
 
 @Injectable()
 export class AuthService {
+  private logger = new Logger('UserService');
   constructor(
     @InjectRepository(UsersRepository)
     private usersRepository: UsersRepository,
@@ -32,6 +40,24 @@ export class AuthService {
       return { accessToken };
     } else {
       throw new UnauthorizedException('Please check your login credentials');
+    }
+  }
+
+  async updateAccount(id: string, userUpdateDto: UserUpdateDto): Promise<User> {
+    const userToUpdate = await this.usersRepository.findOne({ id });
+    console.log(userToUpdate);
+
+    if (userToUpdate === null || undefined) {
+      this.logger.error(
+        `No user with ID ${id} Found! ID is either null or undefined.`,
+      );
+      throw new NotFoundException();
+    } else {
+      userToUpdate.username = userUpdateDto.username;
+      userToUpdate.email = userUpdateDto.email;
+      userToUpdate.password = userUpdateDto.password;
+      await this.usersRepository.save(userToUpdate);
+      return userToUpdate;
     }
   }
 }
