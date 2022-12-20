@@ -25,7 +25,7 @@ export class AdminService {
     const updateStatus = await this.usersRepository
       .createQueryBuilder()
       .update(User)
-      .set({ isactive: true })
+      .set({ isactive: false })
       .where({ username: In(usernames) })
       .execute();
     return updateStatus;
