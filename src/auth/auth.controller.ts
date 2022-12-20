@@ -1,6 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { UserUpdateDto } from './dto/user-update.dto';
+import { User } from './user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -16,5 +18,12 @@ export class AuthController {
   ): Promise<{ accessToken: string }> {
     console.log(authCredentialsDto);
     return this.authService.login(authCredentialsDto);
+  }
+  @Patch('/update/:id')
+  updateAccount(
+    @Param('id') id: string,
+    @Body() userUpdateDto: UserUpdateDto,
+  ): Promise<User> {
+    return this.authService.updateAccount(id, userUpdateDto);
   }
 }
