@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In } from 'typeorm';
 import { User } from '../auth/user.entity';
@@ -28,6 +28,19 @@ export class AdminService {
       .set({ isactive: false })
       .where({ username: In(usernames) })
       .execute();
+
+    if (updateStatus.affected === 0) {
+      Logger.warn('No users Eliminated!');
+    } else {
+      Logger.log(`${updateStatus.affected} Users Eliminated!`);
+    }
     return updateStatus;
+  }
+  async deleteUser(id: string): Promise<void> {
+    const result = await this.usersRepository.delete({ id });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(`No User with id ${id}`);
+    }
   }
 }

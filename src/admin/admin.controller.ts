@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/auth/user.entity';
 import { AdminService } from './admin.service';
@@ -18,5 +26,12 @@ export class AdminController {
     usernames: string[],
   ) {
     return this.adminService.elimByUsername(usernames);
+  }
+  @Delete('/deleteUser/:id')
+  deleteUser(
+    @Param('id')
+    id: string,
+  ): Promise<void> {
+    return this.adminService.deleteUser(id);
   }
 }
