@@ -11,11 +11,7 @@ export class AdminService {
     private usersRepository: UsersRepository,
   ) {}
   async getUsers(): Promise<User[]> {
-    const users = await this.usersRepository.find({
-      where: {
-        isactive: true,
-      },
-    });
+    const users = await this.usersRepository.find();
     return users;
   }
   async getUserById(id: string): Promise<User> {

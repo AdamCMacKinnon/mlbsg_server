@@ -8,6 +8,10 @@ import { User } from './user.entity';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Get('/users/:id')
+  getUserById(@Param('id') id: string): Promise<User> {
+    return this.authService.getUserById(id);
+  }
   @Get('/standings')
   getStandings(): Promise<User[]> {
     return this.authService.getStandings();

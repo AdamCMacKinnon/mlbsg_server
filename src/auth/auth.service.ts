@@ -12,7 +12,6 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
-import { identity } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -60,6 +59,14 @@ export class AuthService {
       await this.usersRepository.save(userToUpdate);
       return userToUpdate;
     }
+  }
+  async getUserById(id: string): Promise<User> {
+    const userById = await this.usersRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    return userById;
   }
 
   async getStandings(): Promise<User[]> {
