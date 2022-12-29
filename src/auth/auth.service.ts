@@ -60,4 +60,17 @@ export class AuthService {
       return userToUpdate;
     }
   }
+  async getUserById(id: string): Promise<User> {
+    const userById = await this.usersRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    return userById;
+  }
+
+  async getStandings(): Promise<User[]> {
+    const userList = await this.usersRepository.find();
+    return userList;
+  }
 }

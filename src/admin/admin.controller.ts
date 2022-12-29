@@ -20,6 +20,10 @@ export class AdminController {
   getUsers(): Promise<User[]> {
     return this.adminService.getUsers();
   }
+  @Get('/users/:id')
+  getUserById(@Param('id') id: string): Promise<User> {
+    return this.adminService.getUserById(id);
+  }
   @Patch('/eliminate')
   elimUsers(
     @Body('username')
