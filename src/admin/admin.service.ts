@@ -12,14 +12,19 @@ export class AdminService {
   ) {}
   async getUsers(): Promise<User[]> {
     const users = await this.usersRepository.find({
-      // TODO:  Streamline by making a new Repository in Admin for that specific use case
-      // Right now, we're modifying the user object, albeit with data that would not be needed anywhere else, but still.
-      // From a scalability perspective, response is probably too verbose.
       where: {
         isactive: true,
       },
     });
     return users;
+  }
+  async getUserById(id: string): Promise<User> {
+    const userById = await this.usersRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+    return userById;
   }
   async elimByUsername(usernames: string[]) {
     const updateStatus = await this.usersRepository

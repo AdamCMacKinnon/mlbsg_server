@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { UserUpdateDto } from './dto/user-update.dto';
@@ -8,6 +8,10 @@ import { User } from './user.entity';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Get('/standings')
+  getStandings(): Promise<User[]> {
+    return this.authService.getStandings();
+  }
   @Post('/register')
   register(@Body() authCredentialsDto: AuthCredentialsDto): Promise<void> {
     return this.authService.register(authCredentialsDto);
