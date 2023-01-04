@@ -26,6 +26,7 @@ export class Picks {
   @UpdateDateColumn({ type: 'timestamp', precision: 3 })
   updatedAt: Date;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, (user) => user.picks, { eager: false })
   @Exclude({ toPlainOnly: true })
   user: User;

@@ -11,6 +11,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new TransformInterceptor());
   await app.listen(port);
-  logger.log(`Application is up and running on ${port}!`);
+  logger.log(
+    `Application is up and running on ${port}! in ${process.env.STAGE} Environment.  DB CONNECTION: ${process.env.DB_HOST}`,
+  );
 }
 bootstrap();
