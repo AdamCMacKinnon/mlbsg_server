@@ -20,6 +20,7 @@ export class PicksController {
     return this.picksService.getUserPicks(user);
   }
   @Post()
+  @Roles(Role.player)
   makePicks(
     @Body() makePicksDto: MakePicksDto,
     @GetUser() user: User,

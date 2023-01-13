@@ -32,10 +32,6 @@ export class User {
   @Column({ default: Role.player })
   role: Role;
 
-  @Exclude({ toPlainOnly: true })
-  @Column({ default: false })
-  pastchamp: boolean;
-
   @Column({ default: 0 })
   diff: number;
 
