@@ -3,13 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { PicksModule } from './picks/picks.module';
 import { AdminModule } from './admin/admin.module';
-import { ConfigModule } from '@nestjs/config';
+
+// SERIOUS TODOS:  LOOK INTO CONFIG OPTIONS, SYNCHRONIZE CANNOT BE ON WHEN WE GO TO PRODUCTION!!
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: [`.env.stage.${process.env.STAGE}`],
-    }),
     PicksModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -21,6 +19,7 @@ import { ConfigModule } from '@nestjs/config';
       migrations: ['dist/migrations*.js'],
       autoLoadEntities: true,
       migrationsRun: true,
+      synchronize: true,
       logging: true,
     }),
     AuthModule,

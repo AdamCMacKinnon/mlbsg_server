@@ -2,6 +2,7 @@ import { Expose } from 'class-transformer';
 import {
   IsBoolean,
   IsDateString,
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
@@ -9,6 +10,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Role } from '../enums/roles.enum';
 
 export class AuthCredentialsDto {
   @Expose()
@@ -37,8 +39,8 @@ export class AuthCredentialsDto {
   @IsNumber()
   diff: number;
   @IsOptional()
-  @IsBoolean()
-  admin: boolean;
+  @IsEnum(Role)
+  role: Role;
   @IsOptional()
   @IsBoolean()
   pastchamp: boolean;

@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { Role } from './enums/roles.enum';
 
 @Entity()
 export class User {
@@ -28,8 +29,8 @@ export class User {
   @Column({ default: true })
   isactive: boolean;
 
-  @Column({ default: false })
-  admin: boolean;
+  @Column({ default: Role.player })
+  role: Role;
 
   @Exclude({ toPlainOnly: true })
   @Column({ default: false })
