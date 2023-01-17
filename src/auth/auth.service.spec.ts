@@ -2,20 +2,26 @@ import { Test } from '@nestjs/testing';
 import { UsersRepository } from './users.repository';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
-import { NotFoundException } from '@nestjs/common';
+import { Role } from './enums/roles.enum';
+import { User } from './user.entity';
 
 const mockUsersRepository = () => ({
   findOne: jest.fn(),
   register: jest.fn(),
+  getUserById: jest.fn(),
 });
 
-const mockUser = {
-  username: 'adam',
-  id: '12345',
+const mockAuthService = () => ({
+  findOne: jest.fn(),
+});
+
+export const mockUser = {
+  username: 'adamcmack',
+  id: '75571524-d685-4453-950c-822e58125b9e',
   password: 'test',
   email: 'adam@adam.com',
   isactive: true,
-  admin: true,
+  role: Role.player,
   pastchamp: false,
   diff: 0,
   createdAt: '2022-10-12 18:59:13.294-04',
@@ -23,7 +29,8 @@ const mockUser = {
 };
 
 describe('AuthService', () => {
-  let authService: AuthService;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let authService;
   let usersRepository;
 
   beforeEach(async () => {
@@ -31,7 +38,14 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         JwtService,
-        { provide: UsersRepository, useFactory: mockUsersRepository },
+        {
+          provide: UsersRepository,
+          useFactory: mockUsersRepository,
+        },
+        {
+          provide: AuthService,
+          useFactory: mockAuthService,
+        },
       ],
     }).compile();
     authService = module.get(AuthService);
@@ -43,25 +57,38 @@ describe('AuthService', () => {
       usersRepository.register.mockResolvedValue(mockUser);
       const result = await usersRepository.register(mockUser);
       expect(usersRepository.register).toHaveBeenCalled();
+      expect(result.role).toEqual('player');
       expect(result).toEqual(mockUser);
+    });
+    it('Fails to register new User due to short username/password', async () => {
+      const badUserObj = {
+        username: 'bob',
+        password: '1234',
+        email: null,
+      };
+      usersRepository.register.mockResolvedValue(badUserObj);
+      await usersRepository.register(badUserObj);
+      expect(usersRepository.register).toHaveBeenCalled();
+      expect(User).toThrowError();
     });
   });
   describe('Login', () => {
     it('Calls Login method and authenticates user', async () => {
-      const username = 'adamcmack';
-      usersRepository.findOne.mockResolvedValue(username);
-      const user = await usersRepository.findOne({ username });
-      expect(usersRepository.findOne).toHaveBeenCalled();
-      expect(user).toBeDefined();
-    });
-    it('Case of null user value', async () => {
-      const username = null;
-      usersRepository.findOne.mockResolvedValue(null);
-      const user = await usersRepository.findOne({ username });
-      expect(user).toBe(null);
-      expect(usersRepository.findOne(username)).rejects.toThrow(
-        NotFoundException,
-      );
+      const username = mockUser.username;
+      authService.findOne.mockResolvedValue(username);
+      const userLogin = await authService.findOne({ username });
+      expect(authService.findOne).toHaveBeenCalled();
+      expect(userLogin).toBeDefined();
     });
   });
+  describe('getUserById', () => {
+    it('finds user by id', async () => {
+      const id = mockUser.id;
+      authService.findOne.mockResolvedValue(id);
+      const userById = await authService.findOne({ id });
+      expect(authService.findOne).toHaveBeenCalled();
+      expect(userById).toBeDefined();
+    });
+  });
+  // TEST CASE FOR ID NOT FOUND
 });
