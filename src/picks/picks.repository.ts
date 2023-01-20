@@ -3,6 +3,7 @@ import { User } from '../auth/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { MakePicksDto } from './dto/make-picks.dto';
 import { Picks } from './picks.entity';
+import { getPickId } from './pickIdGenerator';
 
 @EntityRepository(Picks)
 export class PicksRepository extends Repository<Picks> {
@@ -16,7 +17,9 @@ export class PicksRepository extends Repository<Picks> {
     const logger = new Logger();
     const { week, pick } = makePicksDto;
     console.log(makePicksDto);
+    const pickId = await getPickId(user);
     const userPick = this.create({
+      pickId,
       week,
       pick,
       user,
