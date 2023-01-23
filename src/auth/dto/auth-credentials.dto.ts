@@ -16,6 +16,7 @@ export class AuthCredentialsDto {
   @Expose()
   id: string;
 
+  @IsOptional()
   @IsString()
   @MinLength(8)
   @MaxLength(20)

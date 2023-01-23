@@ -80,6 +80,13 @@ describe('AuthService', () => {
       expect(authService.findOne).toHaveBeenCalled();
       expect(userLogin).toBeDefined();
     });
+    it('logs user in with email', async () => {
+      const email = mockUser.email;
+      authService.findOne.mockResolvedValue(email);
+      const emailLogin = await authService.findOne({ email });
+      expect(authService.findOne).toHaveBeenCalled();
+      expect(emailLogin).toBeDefined();
+    });
   });
   describe('getUserById', () => {
     it('finds user by id', async () => {
