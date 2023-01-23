@@ -15,5 +15,5 @@
 <br><br>
 
 <h3>Branching Strategy and Deployment Listing:
-<img src="/server/assets/mlbsg_diagram.drawio.png">
+<img src="./assets/mlbsg_diagram.drawio.png">
 
