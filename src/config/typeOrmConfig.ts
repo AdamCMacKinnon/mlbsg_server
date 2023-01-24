@@ -8,5 +8,8 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   password: process.env.DB_PASS,
   database: process.env.DB_USER,
   autoLoadEntities: true,
+  // migrations: ['dist/migrations*.js'],
   synchronize: true,
+  // migrationsRun: true,
+  logging: true,
 };
