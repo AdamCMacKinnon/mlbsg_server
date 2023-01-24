@@ -15,5 +15,15 @@
 <br><br>
 
 <h3>Branching Strategy and Deployment Listing:
-<img src="./assets/mlbsg_diagram.drawio.png">
-
+<img src="./assets/mlbsgBE_diagram.drawio.png">
+<br><br>
+MLBSG Developers:
+<br><br>
+Adam C. MacKinnon
+<li> Nest.JS Back End Development
+<li> Database Management
+<li> DevOps/Release Management
+<br><br>
+Chris Owens
+<li> React.JS Front End Development
+<li> Front End Support
