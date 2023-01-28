@@ -12,6 +12,7 @@ export class AdminService {
   ) {}
   async getUsers(): Promise<User[]> {
     const users = await this.usersRepository.find();
+    Logger.log(`${users.length} Users returned!`);
     return users;
   }
   async getUserById(id: string): Promise<User> {
@@ -42,6 +43,8 @@ export class AdminService {
 
     if (result.affected === 0) {
       throw new NotFoundException(`No User with id ${id}`);
+    } else {
+      Logger.warn(`User Deleted Successfully`);
     }
   }
 }

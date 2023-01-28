@@ -12,7 +12,6 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
-
 @Injectable()
 export class AuthService {
   private logger = new Logger('UserService');
@@ -49,7 +48,7 @@ export class AuthService {
     const userToUpdate = await this.usersRepository.findOne({ id });
     console.log(userToUpdate);
 
-    if (userToUpdate === null || undefined) {
+    if (!userToUpdate) {
       this.logger.error(
         `No user with ID ${id} Found! ID is either null or undefined.`,
       );
@@ -59,6 +58,7 @@ export class AuthService {
       userToUpdate.email = userUpdateDto.email;
       userToUpdate.password = userUpdateDto.password;
       await this.usersRepository.save(userToUpdate);
+      Logger.log(`User information successfully updated!`);
       return userToUpdate;
     }
   }
@@ -68,11 +68,16 @@ export class AuthService {
         id: id,
       },
     });
+    Logger.log(`${userById} Returned Successfully`);
+    if (!userById) {
+      throw new NotFoundException('No Such User with that ID!');
+    }
     return userById;
   }
 
   async getStandings(): Promise<User[]> {
     const userList = await this.usersRepository.find();
+    Logger.log(`${userList.length} Users returned for Leaderboard`);
     return userList;
   }
 }

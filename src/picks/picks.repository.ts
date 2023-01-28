@@ -8,25 +8,35 @@ import { getPickId } from './pickIdGenerator';
 @EntityRepository(Picks)
 export class PicksRepository extends Repository<Picks> {
   async getUserPicks(user: User): Promise<Picks[]> {
-    console.log(user);
-    const picks = await this.query.arguments(user);
-    return picks;
+    try {
+      const picks = await this.query.arguments(user);
+      Logger.log(`Picks for ${user.id} successfully retrieved`);
+      return picks;
+    } catch (error) {
+      Logger.error(`An ERROR OCCURED getting Picks for ${user.id}`);
+      return error;
+    }
   }
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
-    console.log(user);
-    const logger = new Logger();
-    const { week, pick } = makePicksDto;
-    console.log(makePicksDto);
-    const pickId = await getPickId(user);
-    const userPick = this.create({
-      pickId,
-      week,
-      pick,
-      user,
-    });
-    logger.warn(`New Picks Array Created!`);
-    await this.save(userPick);
-    console.log(user);
-    return userPick;
+    try {
+      const { week, pick } = makePicksDto;
+      const pickId = await getPickId(user);
+      const userPick = this.create({
+        pickId,
+        week,
+        pick,
+        user,
+      });
+      Logger.log(
+        `PICK ID:${userPick.pickId}, WEEK:${userPick.week}, TEAM: ${userPick.pick}, USER: ${user.username}!`,
+      );
+      await this.save(userPick);
+      return userPick;
+    } catch (error) {
+      Logger.error(
+        `An ERROR OCCURED WHILE MAKING PICK FOR ${user.id}: ${error}`,
+      );
+      return error;
+    }
   }
 }
