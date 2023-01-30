@@ -37,8 +37,8 @@ export class AdminController {
     return this.adminService.elimByUsername(usernames);
   }
   @Patch('/updateDiffByTeam')
-  updateRunDiff(@Body() updateDiffDto: UpdateDiffDto, user: User) {
-    return this.adminService.updateRunDiff(updateDiffDto, user);
+  updateRunDiff(@Body() updateDiffDto: UpdateDiffDto) {
+    return this.adminService.updateRunDiff(updateDiffDto);
   }
   @Delete('/deleteUser/:id')
   deleteUser(

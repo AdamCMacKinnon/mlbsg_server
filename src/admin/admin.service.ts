@@ -43,7 +43,7 @@ export class AdminService {
     }
     return updateStatus;
   }
-  async updateRunDiff(updateDiffDto: UpdateDiffDto, user: User) {
+  async updateRunDiff(updateDiffDto: UpdateDiffDto) {
     console.log(updateDiffDto);
     const { week, team, diff } = updateDiffDto;
     const updateDiff = await this.picksRepository

@@ -1,7 +1,6 @@
 import { User } from '../auth/user.entity';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { UUIDVersion } from 'class-validator';
 
 @Entity()
 export class Picks {
