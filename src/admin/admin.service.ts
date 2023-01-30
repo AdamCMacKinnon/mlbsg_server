@@ -3,13 +3,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { UsersRepository } from '../auth/users.repository';
+import { UpdateDiffDto } from './dto/update-diff.dto';
+import { PicksRepository } from 'src/picks/picks.repository';
+import { Picks } from 'src/picks/picks.entity';
 
 @Injectable()
 export class AdminService {
   constructor(
     @InjectRepository(User)
     private usersRepository: UsersRepository,
+    @InjectRepository(Picks)
+    private picksRepository: PicksRepository,
   ) {}
+
   async getUsers(): Promise<User[]> {
     const users = await this.usersRepository.find();
     return users;
@@ -36,6 +42,26 @@ export class AdminService {
       Logger.log(`${updateStatus.affected} Users Eliminated!`);
     }
     return updateStatus;
+  }
+  async updateRunDiff(updateDiffDto: UpdateDiffDto) {
+    console.log(updateDiffDto);
+    const { week, team, diff } = updateDiffDto;
+    const updateDiff = await this.picksRepository
+      .createQueryBuilder()
+      .update(Picks)
+      .set({ run_diff: diff })
+      .where({ week: week })
+      .andWhere({ pick: team })
+      .execute();
+
+    if (updateDiff.affected > 0) {
+      Logger.log(
+        `${updateDiff.affected} Picks Run Differentials Updated!  Updating User Totals...`,
+      );
+    } else {
+      Logger.warn('No user Diffs were updated!');
+    }
+    return updateDiff;
   }
   async deleteUser(id: string): Promise<void> {
     const result = await this.usersRepository.delete({ id });

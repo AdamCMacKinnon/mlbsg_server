@@ -13,6 +13,7 @@ import { Role } from 'src/auth/enums/roles.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { User } from 'src/auth/user.entity';
 import { AdminService } from './admin.service';
+import { UpdateDiffDto } from './dto/update-diff.dto';
 
 @Controller('admin')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -34,6 +35,10 @@ export class AdminController {
     usernames: string[],
   ) {
     return this.adminService.elimByUsername(usernames);
+  }
+  @Patch('/updateDiff')
+  updateRunDiff(@Body() updateDiffDto: UpdateDiffDto) {
+    return this.adminService.updateRunDiff(updateDiffDto);
   }
   @Delete('/deleteUser/:id')
   deleteUser(
