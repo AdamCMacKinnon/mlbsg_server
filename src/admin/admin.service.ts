@@ -43,7 +43,7 @@ export class AdminService {
     }
     return updateStatus;
   }
-  async updateRunDiff(updateDiffDto: UpdateDiffDto) {
+  async updateRunDiff(updateDiffDto: UpdateDiffDto, user: User) {
     console.log(updateDiffDto);
     const { week, team, diff } = updateDiffDto;
     const updateDiff = await this.picksRepository
@@ -52,12 +52,28 @@ export class AdminService {
       .set({ run_diff: diff })
       .where({ week: week })
       .andWhere({ pick: team })
+      .returning('"userId"')
       .execute();
-
+    console.log(updateDiff.raw);
     if (updateDiff.affected > 0) {
       Logger.log(
-        `${updateDiff.affected} Picks Run Differentials Updated!  Updating User Totals...`,
+        `${updateDiff.affected} Users Affected!  Updating User Totals...`,
       );
+      const userList = updateDiff.raw.map((x: { userId: string }) => x.userId);
+      const usersToUpdate = await this.picksRepository
+        .createQueryBuilder()
+        .where({ userId: In(userList) })
+        .andWhere({ week: updateDiffDto.week })
+        .execute();
+      console.log(usersToUpdate);
+      for (let x = 0; x < usersToUpdate.length; x++) {
+        await this.usersRepository
+          .createQueryBuilder()
+          .update(User)
+          .set({ diff: () => `diff + ${usersToUpdate[x].Picks_run_diff}` })
+          .where({ id: usersToUpdate[x].Picks_userId })
+          .execute();
+      }
     } else {
       Logger.warn('No user Diffs were updated!');
     }
