@@ -81,12 +81,16 @@ export class AdminService {
     return updateDiff;
   }
   async deleteUser(id: string): Promise<void> {
-    const result = await this.usersRepository.delete({ id });
-
-    if (result.affected === 0) {
-      throw new NotFoundException(`No User with id ${id}`);
-    } else {
-      Logger.warn(`User Deleted Successfully`);
+    try {
+      const result = await this.usersRepository.delete({ id });
+      if (result.affected === 0) {
+        throw new NotFoundException(`No User with id ${id}`);
+      } else {
+        Logger.warn(`User Deleted Successfully`);
+      }
+    } catch (error) {
+      Logger.error(`AN ERROR OCCURED: ${error.message}`);
+      throw 500;
     }
   }
 }

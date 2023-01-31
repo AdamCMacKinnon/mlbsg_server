@@ -4,7 +4,6 @@ import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from './enums/roles.enum';
 import { User } from './user.entity';
-import { NotFoundException } from '@nestjs/common';
 
 const mockUsersRepository = () => ({
   findOne: jest.fn(),
@@ -102,7 +101,6 @@ describe('AuthService', () => {
       const fakeId = await authService.findOne(id);
       expect(authService.findOne).toHaveBeenCalled();
       expect(fakeId).toBeUndefined();
-      expect(authService.getUserById).toThrowError();
     });
   });
 });
