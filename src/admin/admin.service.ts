@@ -18,6 +18,7 @@ export class AdminService {
 
   async getUsers(): Promise<User[]> {
     const users = await this.usersRepository.find();
+    Logger.log(`${users.length} Users returned!`);
     return users;
   }
   async getUserById(id: string): Promise<User> {
@@ -80,10 +81,16 @@ export class AdminService {
     return updateDiff;
   }
   async deleteUser(id: string): Promise<void> {
-    const result = await this.usersRepository.delete({ id });
-
-    if (result.affected === 0) {
-      throw new NotFoundException(`No User with id ${id}`);
+    try {
+      const result = await this.usersRepository.delete({ id });
+      if (result.affected === 0) {
+        throw new NotFoundException(`No User with id ${id}`);
+      } else {
+        Logger.warn(`User Deleted Successfully`);
+      }
+    } catch (error) {
+      Logger.error(`AN ERROR OCCURED: ${error.message}`);
+      throw 500;
     }
   }
 }
