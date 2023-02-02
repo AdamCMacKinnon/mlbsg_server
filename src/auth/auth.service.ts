@@ -35,7 +35,6 @@ export class AuthService {
         where: [{ email: email }, { username: username }],
       });
       id = user.id;
-      console.log(user);
       if (user && (await bcrypt.compare(password, user.password))) {
         const payload: JwtPayload = { id };
         const accessToken: string = await this.jwtService.sign(payload);
@@ -52,7 +51,6 @@ export class AuthService {
   async updateAccount(id: string, userUpdateDto: UserUpdateDto): Promise<User> {
     try {
       const userToUpdate = await this.usersRepository.findOne({ id });
-      console.log(userToUpdate);
 
       if (!userToUpdate) {
         this.logger.error(

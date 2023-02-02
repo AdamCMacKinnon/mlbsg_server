@@ -45,7 +45,6 @@ export class AdminService {
     return updateStatus;
   }
   async updateRunDiff(updateDiffDto: UpdateDiffDto) {
-    console.log(updateDiffDto);
     const { week, team, diff } = updateDiffDto;
     const updateDiff = await this.picksRepository
       .createQueryBuilder()
@@ -55,7 +54,6 @@ export class AdminService {
       .andWhere({ pick: team })
       .returning('"userId"')
       .execute();
-    console.log(updateDiff.raw);
     if (updateDiff.affected > 0) {
       Logger.log(
         `${updateDiff.affected} Users Affected!  Updating User Totals...`,
@@ -66,7 +64,6 @@ export class AdminService {
         .where({ userId: In(userList) })
         .andWhere({ week: updateDiffDto.week })
         .execute();
-      console.log(usersToUpdate);
       for (let x = 0; x < usersToUpdate.length; x++) {
         await this.usersRepository
           .createQueryBuilder()
