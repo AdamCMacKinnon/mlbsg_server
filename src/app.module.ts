@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { PicksModule } from './picks/picks.module';
 import { AdminModule } from './admin/admin.module';
+import { SupportModule } from './support/support.module';
 
 // SERIOUS TODOS:  LOOK INTO CONFIG OPTIONS, SYNCHRONIZE CANNOT BE ON WHEN WE GO TO PRODUCTION!!
 
@@ -24,6 +25,7 @@ import { AdminModule } from './admin/admin.module';
     }),
     AuthModule,
     AdminModule,
+    SupportModule,
   ],
 })
 export class AppModule {}

@@ -13,7 +13,10 @@ export class Support {
   ticketId: string;
 
   @Column({ nullable: true })
-  userId: string;
+  username: string;
+
+  @Column()
+  email: string;
 
   @Column()
   issue_type: SupportType;

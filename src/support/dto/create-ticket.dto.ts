@@ -1,7 +1,8 @@
 import { SupportType } from '../enums/types.enums';
 
 export class CreateTicketDto {
-  userId?: string;
-  body: string;
-  issue: SupportType;
+  username?: string;
+  email: string;
+  ticket_body: string;
+  issue_type: SupportType;
 }
