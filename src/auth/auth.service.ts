@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -27,7 +28,7 @@ export class AuthService {
 
   async login(
     authCredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       const { username, password, email } = authCredentialsDto;
       let { id } = authCredentialsDto;
@@ -37,8 +38,13 @@ export class AuthService {
       id = user.id;
       if (user && (await bcrypt.compare(password, user.password))) {
         const payload: JwtPayload = { id };
-        const accessToken: string = await this.jwtService.sign(payload);
-        return { accessToken };
+        const [accessToken, refreshToken] = await Promise.all([
+          this.jwtService.sign(payload, { secret: String(process.env.SECRET) }),
+          this.jwtService.sign(payload, {
+            secret: String(process.env.REFRESH_SECRET),
+          }),
+        ]);
+        return { accessToken, refreshToken };
       } else {
         throw new UnauthorizedException('Please check your login credentials');
       }
@@ -73,13 +79,14 @@ export class AuthService {
     }
   }
   async getUserById(id: string): Promise<User> {
+    console.log(id);
     try {
       const userById = await this.usersRepository.findOne({
         where: {
           id: id,
         },
       });
-      Logger.log(`${userById} Returned Successfully`);
+      Logger.log(`ID ${userById.id} Returned Successfully`);
       if (!userById) {
         throw new NotFoundException('No Such User with that ID!');
       }
@@ -100,6 +107,19 @@ export class AuthService {
         `AN ERROR OCCURED IN GetStandings Service: ${error.message}`,
       );
       throw 500;
+    }
+  }
+
+  async refreshToken(id: string, refreshToken: string) {
+    console.log(id);
+    const user = await this.getUserById(id);
+    if (!user) {
+      throw new ForbiddenException(
+        `Token Refresh Error. ID ${id} not found or Undefined!`,
+      );
+    } else {
+      const refresh = await this.jwtService.verify(refreshToken);
+      return refresh;
     }
   }
 }
