@@ -4,11 +4,15 @@ import { AuthModule } from './auth/auth.module';
 import { PicksModule } from './picks/picks.module';
 import { AdminModule } from './admin/admin.module';
 import { SupportModule } from './support/support.module';
+import { ConfigModule } from '@nestjs/config';
 
 // SERIOUS TODOS:  LOOK INTO CONFIG OPTIONS, SYNCHRONIZE CANNOT BE ON WHEN WE GO TO PRODUCTION!!
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: `.env.${process.env.STAGE}`,
+    }),
     PicksModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
