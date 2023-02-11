@@ -39,9 +39,9 @@ export class AuthService {
       if (user && (await bcrypt.compare(password, user.password))) {
         const payload: JwtPayload = { id };
         const [accessToken, refreshToken] = await Promise.all([
-          this.jwtService.sign(payload, { secret: String(process.env.SECRET) }),
+          this.jwtService.sign(payload, { secret: process.env.SECRET }),
           this.jwtService.sign(payload, {
-            secret: String(process.env.REFRESH_SECRET),
+            secret: process.env.REFRESH_SECRET,
           }),
         ]);
         return { accessToken, refreshToken };
