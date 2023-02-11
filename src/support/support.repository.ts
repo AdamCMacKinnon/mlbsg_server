@@ -33,7 +33,6 @@ export class SupportRepository extends Repository<Support> {
 }
 
 export async function sendEmail(createTicketDto: CreateTicketDto) {
-  const trelloEmail = 'adammackinnon3+h3fqpkghrpbi2c46qxth@boards.trello.com';
   const { username, email, ticket_body, issue_type } = createTicketDto;
   const emailBody = `
   User ${email} reporting issue regarding ${issue_type}:\n
@@ -52,7 +51,7 @@ export async function sendEmail(createTicketDto: CreateTicketDto) {
   console.log(emailBody);
   const mailData = await transporter.sendMail({
     from: '"MLBSG Support"<layrfive_mlbsgv2@hotmail.com>',
-    to: `${trelloEmail}`,
+    to: process.env.TRELLO_EMAIL,
     subject: issue_type,
     text: emailBody,
   });
