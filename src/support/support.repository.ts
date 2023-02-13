@@ -48,7 +48,6 @@ export async function sendEmail(createTicketDto: CreateTicketDto) {
       pass: process.env.EMAIL_PASS,
     },
   });
-  console.log(emailBody);
   const mailData = await transporter.sendMail({
     from: '"MLBSG Support"<layrfive_mlbsgv2@hotmail.com>',
     to: process.env.TRELLO_EMAIL,

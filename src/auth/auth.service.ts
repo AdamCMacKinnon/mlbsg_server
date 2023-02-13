@@ -79,7 +79,6 @@ export class AuthService {
     }
   }
   async getUserById(id: string): Promise<User> {
-    console.log(id);
     try {
       const userById = await this.usersRepository.findOne({
         where: {
@@ -111,7 +110,6 @@ export class AuthService {
   }
 
   async refreshToken(id: string, refreshToken: string) {
-    console.log(id);
     const user = await this.getUserById(id);
     if (!user) {
       throw new ForbiddenException(
