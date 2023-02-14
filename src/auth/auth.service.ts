@@ -55,22 +55,22 @@ export class AuthService {
   }
 
   async updateAccount(id: string, userUpdateDto: UserUpdateDto): Promise<User> {
+    const { username, email, password } = userUpdateDto;
     try {
-      const userToUpdate = await this.usersRepository.findOne({ id });
+      const userToUpdate = await this.usersRepository.findOne({
+        where: [{ id }, { email }, { username }],
+      });
+      userToUpdate.username = username;
+      userToUpdate.email = email;
 
-      if (!userToUpdate) {
-        this.logger.error(
-          `No user with ID ${id} Found! ID is either null or undefined.`,
-        );
-        throw new NotFoundException();
-      } else {
-        userToUpdate.username = userUpdateDto.username;
-        userToUpdate.email = userUpdateDto.email;
-        userToUpdate.password = userUpdateDto.password;
-        await this.usersRepository.save(userToUpdate);
-        Logger.log(`User information successfully updated!`);
-        return userToUpdate;
+      if (password) {
+        const salt = await bcrypt.genSalt();
+        const updatePassHash = await bcrypt.hash(password, salt);
+        userToUpdate.password = updatePassHash;
       }
+      await this.usersRepository.save(userToUpdate);
+      Logger.log(`User information successfully updated!`);
+      return userToUpdate;
     } catch (error) {
       Logger.error(
         `AN ERROR OCCURED IN UpdateAccount Service: ${error.message}`,
