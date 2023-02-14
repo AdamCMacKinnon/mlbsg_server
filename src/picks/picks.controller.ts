@@ -20,7 +20,6 @@ export class PicksController {
     @Body() makePicksDto: MakePicksDto,
     @GetUser() user: User,
   ): Promise<Picks> {
-    console.log(makePicksDto);
     return this.picksService.makePicks(makePicksDto, user);
   }
 }

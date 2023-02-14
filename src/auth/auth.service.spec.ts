@@ -8,11 +8,11 @@ import { User } from './user.entity';
 const mockUsersRepository = () => ({
   findOne: jest.fn(),
   register: jest.fn(),
-  getUserById: jest.fn(),
 });
 
 const mockAuthService = () => ({
   findOne: jest.fn(),
+  getUserById: jest.fn(),
 });
 
 export const mockUser = {
@@ -96,6 +96,11 @@ describe('AuthService', () => {
       expect(authService.findOne).toHaveBeenCalled();
       expect(userById).toBeDefined();
     });
+    it('should throw error when ID is null or undefined', async () => {
+      const id = '123';
+      const fakeId = await authService.findOne(id);
+      expect(authService.findOne).toHaveBeenCalled();
+      expect(fakeId).toBeUndefined();
+    });
   });
-  // TEST CASE FOR ID NOT FOUND
 });

@@ -12,6 +12,13 @@ export class AuthController {
   getUserById(@Param('id') id: string): Promise<User> {
     return this.authService.getUserById(id);
   }
+  @Get('refreshtoken/:id')
+  refreshToken(
+    @Param('id') id: string,
+    refreshToken: string,
+  ): Promise<{ refreshToken: string }> {
+    return this.authService.refreshToken(id, refreshToken);
+  }
   @Get('/standings')
   getStandings(): Promise<User[]> {
     return this.authService.getStandings();
@@ -23,8 +30,7 @@ export class AuthController {
   @Post('/login')
   login(
     @Body() authCredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string }> {
-    console.log(authCredentialsDto);
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     return this.authService.login(authCredentialsDto);
   }
   @Patch('/update/:id')
