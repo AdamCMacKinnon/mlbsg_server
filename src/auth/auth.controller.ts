@@ -33,11 +33,8 @@ export class AuthController {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     return this.authService.login(authCredentialsDto);
   }
-  @Patch('/update/:id')
-  updateAccount(
-    @Param('id') id: string,
-    @Body() userUpdateDto: UserUpdateDto,
-  ): Promise<User> {
-    return this.authService.updateAccount(id, userUpdateDto);
+  @Patch('/update')
+  updateAccount(@Body() userUpdateDto: UserUpdateDto): Promise<User> {
+    return this.authService.updateAccount(userUpdateDto);
   }
 }
