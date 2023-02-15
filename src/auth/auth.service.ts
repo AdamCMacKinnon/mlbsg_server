@@ -54,11 +54,11 @@ export class AuthService {
     }
   }
 
-  async updateAccount(id: string, userUpdateDto: UserUpdateDto): Promise<User> {
+  async updateAccount(userUpdateDto: UserUpdateDto): Promise<User> {
     const { username, email, password } = userUpdateDto;
     try {
       const userToUpdate = await this.usersRepository.findOne({
-        where: [{ id }, { email }, { username }],
+        where: [{ email }, { username }],
       });
       userToUpdate.username = username;
       userToUpdate.email = email;
