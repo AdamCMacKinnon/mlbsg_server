@@ -8,10 +8,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { Role } from 'src/auth/enums/roles.enum';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { User } from 'src/auth/user.entity';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/roles.enum';
+import { RolesGuard } from '../auth/roles.guard';
+import { User } from '../auth/user.entity';
 import { AdminService } from './admin.service';
 import { UpdateDiffDto } from './dto/update-diff.dto';
 
