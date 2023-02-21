@@ -4,8 +4,8 @@ import { In } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { UsersRepository } from '../auth/users.repository';
 import { UpdateDiffDto } from './dto/update-diff.dto';
-import { PicksRepository } from 'src/picks/picks.repository';
-import { Picks } from 'src/picks/picks.entity';
+import { PicksRepository } from '../picks/picks.repository';
+import { Picks } from '../picks/picks.entity';
 
 @Injectable()
 export class AdminService {

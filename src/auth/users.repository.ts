@@ -7,7 +7,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { User } from './user.entity';
 import * as bcrypt from 'bcryptjs';
-import { GetUsersFilterDto } from 'src/admin/dto/get-users-filter.dto';
+import { GetUsersFilterDto } from '../admin/dto/get-users-filter.dto';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
