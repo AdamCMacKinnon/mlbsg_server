@@ -6,7 +6,7 @@ import { AdminModule } from './admin/admin.module';
 import { SupportModule } from './support/support.module';
 import { ConfigModule } from '@nestjs/config';
 
-// SERIOUS TODOS:  LOOK INTO CONFIG OPTIONS, SYNCHRONIZE CANNOT BE ON WHEN WE GO TO PRODUCTION!!
+// ONLY set Synchornize to TRUE when schemas are being updated.  Requires separate PR
 
 @Module({
   imports: [
@@ -23,8 +23,8 @@ import { ConfigModule } from '@nestjs/config';
       database: process.env.DB_NAME,
       migrations: ['dist/migrations*.js'],
       autoLoadEntities: true,
-      migrationsRun: true,
-      synchronize: true,
+      migrationsRun: false,
+      synchronize: false,
       logging: true,
     }),
     AuthModule,
