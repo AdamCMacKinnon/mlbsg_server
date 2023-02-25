@@ -13,17 +13,7 @@ import { GetUsersFilterDto } from '../admin/dto/get-users-filter.dto';
 export class UsersRepository extends Repository<User> {
   private logger = new Logger('UsersRepository');
   async createUser(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    const {
-      id,
-      username,
-      password,
-      email,
-      isactive,
-      role,
-      diff,
-      createdAt,
-      updatedAt,
-    } = authCredentialsDto;
+    const { id, username, password, email } = authCredentialsDto;
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -32,13 +22,7 @@ export class UsersRepository extends Repository<User> {
       username,
       password: hashedPassword,
       email,
-      isactive,
-      role,
-      diff,
-      createdAt,
-      updatedAt,
     });
-
     try {
       await this.save(user);
     } catch (error) {
