@@ -15,11 +15,7 @@ export class SupportRepository extends Repository<Support> {
   \t${ticket_body}\n
     \t\tActive username is: ${username}
     `;
-    const notify = await sendEmail(emailBody, emailSubject);
-
-    if (notify) {
-      Logger.log('Email sent!');
-    }
+    await sendEmail(emailBody, emailSubject);
 
     try {
       const newTicket = this.create({
