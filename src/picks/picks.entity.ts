@@ -13,7 +13,7 @@ export class Picks {
   @Column()
   pick: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 0 })
   run_diff: number;
 
   @Column()

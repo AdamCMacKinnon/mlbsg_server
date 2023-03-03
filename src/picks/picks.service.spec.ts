@@ -13,6 +13,7 @@ const mockPicksRepository = () => ({
 });
 
 describe('PicksService', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let picksService: PicksService;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let picksRepository: PicksRepository;
