@@ -1,19 +1,21 @@
 import { Logger } from '@nestjs/common';
+import { sendEmail } from '../utils/emailFunctions';
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { Support } from './support.entity';
-import * as nodemailer from 'nodemailer';
 
 @EntityRepository(Support)
 export class SupportRepository extends Repository<Support> {
   async createTicket(createTicketDto: CreateTicketDto): Promise<Support> {
     const { username, email, ticket_body, issue_type } = createTicketDto;
 
-    const notify = await sendEmail(createTicketDto);
-
-    if (notify) {
-      Logger.log('Email sent!');
-    }
+    const emailSubject = issue_type;
+    const emailBody = `
+    User ${email} reporting issue regarding ${issue_type}:\n
+  \t${ticket_body}\n
+    \t\tActive username is: ${username}
+    `;
+    await sendEmail(emailBody, emailSubject);
 
     try {
       const newTicket = this.create({
@@ -30,30 +32,4 @@ export class SupportRepository extends Repository<Support> {
       return error;
     }
   }
-}
-
-export async function sendEmail(createTicketDto: CreateTicketDto) {
-  const { username, email, ticket_body, issue_type } = createTicketDto;
-  const emailBody = `
-  User ${email} reporting issue regarding ${issue_type}:\n
-\t${ticket_body}\n
-  \t\tActive username is: ${username}
-
-  `;
-
-  const transporter = nodemailer.createTransport({
-    service: 'hotmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-  const mailData = await transporter.sendMail({
-    from: '"MLBSG Support"<layrfive_mlbsgv2@hotmail.com>',
-    to: process.env.TRELLO_EMAIL,
-    subject: issue_type,
-    text: emailBody,
-  });
-  Logger.log(`Email sent with ID:  ${mailData.messageId}`);
-  return mailData;
 }
