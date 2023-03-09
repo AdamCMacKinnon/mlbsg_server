@@ -94,22 +94,28 @@ export class AdminService {
   async emailEmptyUsers(week: number): Promise<User[]> {
     const emailList = [];
     try {
-      const users = await this.usersRepository.find();
+      const users = await this.usersRepository.find({
+        where: {
+          isactive: true,
+        },
+      });
       for (let u = 0; u < users.length; u++) {
-        if (users[u].isactive === true && users[u].picks.length === week - 1) {
-          emailList.push(users[u].email);
+        if (users[u].picks.length === week - 1) {
+          // emailList.push(users[u].email);
+          const userEmail = users[u].email;
           const emailSubject = 'Pick Missing for MLBSG!';
           const emailBody = `
           Hi ${users[u].username}!  Our records indicate you haven't made a pick this week for
-          MLB Survivor Game!  Make sure to get it in for week ${week} before the deadline!
+          MLB Survivor Game!  Make sure to get it in for week ${week} before the deadline!  If you believe you have
+          received this email in error, please send us a message!
           `;
-          await sendEmail(emailBody, emailSubject);
+          await sendEmail(userEmail, emailBody, emailSubject);
         }
       }
       return emailList;
     } catch (error) {
       Logger.error(`ERROR WHILE GENERATING MISSING PICK EMAIL LIST: ${error}`);
-      throw new Error();
+      throw new Error(error.message);
     }
   }
 }

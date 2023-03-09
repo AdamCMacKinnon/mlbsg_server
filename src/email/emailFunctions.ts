@@ -1,7 +1,11 @@
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
-export async function sendEmail(emailBody: string, emailSubject: string) {
+export async function sendEmail(
+  userEmail: string,
+  emailBody: string,
+  emailSubject: string,
+) {
   const transporter = nodemailer.createTransport({
     service: process.env.EMAIL_HOST,
     auth: {
@@ -12,7 +16,7 @@ export async function sendEmail(emailBody: string, emailSubject: string) {
   try {
     const mailData = await transporter.sendMail({
       from: '"MLBSG Support"<layrfive_mlbsgv2@hotmail.com>',
-      to: process.env.TRELLO_EMAIL,
+      to: userEmail,
       subject: emailSubject,
       text: emailBody,
     });

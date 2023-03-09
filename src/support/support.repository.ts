@@ -9,13 +9,14 @@ export class SupportRepository extends Repository<Support> {
   async createTicket(createTicketDto: CreateTicketDto): Promise<Support> {
     const { username, email, ticket_body, issue_type } = createTicketDto;
 
+    const userEmail = process.env.TRELLO_EMAIL;
     const emailSubject = issue_type;
     const emailBody = `
     User ${email} reporting issue regarding ${issue_type}:\n
   \t${ticket_body}\n
     \t\tActive username is: ${username}
     `;
-    await sendEmail(emailBody, emailSubject);
+    await sendEmail(userEmail, emailBody, emailSubject);
 
     try {
       const newTicket = this.create({
