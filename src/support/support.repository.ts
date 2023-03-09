@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { sendEmail } from '../utils/emailFunctions';
+import { sendEmail } from '../email/emailFunctions';
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { Support } from './support.entity';
