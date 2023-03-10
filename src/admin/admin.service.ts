@@ -101,7 +101,7 @@ export class AdminService {
       });
       for (let u = 0; u < users.length; u++) {
         if (users[u].picks.length === week - 1) {
-          // emailList.push(users[u].email);
+          emailList.push(users[u].email);
           const userEmail = users[u].email;
           const emailSubject = 'Pick Missing for MLBSG!';
           const emailBody = `
