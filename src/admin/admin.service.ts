@@ -6,6 +6,7 @@ import { UsersRepository } from '../auth/users.repository';
 import { UpdateDiffDto } from './dto/update-diff.dto';
 import { PicksRepository } from '../picks/picks.repository';
 import { Picks } from '../picks/picks.entity';
+import { sendEmail } from '../email/emailFunctions';
 
 @Injectable()
 export class AdminService {
@@ -88,6 +89,33 @@ export class AdminService {
     } catch (error) {
       Logger.error(`AN ERROR OCCURED: ${error.message}`);
       throw 500;
+    }
+  }
+  async emailEmptyUsers(week: number): Promise<User[]> {
+    const emailList = [];
+    try {
+      const users = await this.usersRepository.find({
+        where: {
+          isactive: true,
+        },
+      });
+      for (let u = 0; u < users.length; u++) {
+        if (users[u].picks.length === week - 1) {
+          emailList.push(users[u].email);
+          const userEmail = users[u].email;
+          const emailSubject = 'Pick Missing for MLBSG!';
+          const emailBody = `
+          Hi ${users[u].username}!  Our records indicate you haven't made a pick this week for
+          MLB Survivor Game!  Make sure to get it in for week ${week} before the deadline!  If you believe you have
+          received this email in error, please send us a message!
+          `;
+          await sendEmail(userEmail, emailBody, emailSubject);
+        }
+      }
+      return emailList;
+    } catch (error) {
+      Logger.error(`ERROR WHILE GENERATING MISSING PICK EMAIL LIST: ${error}`);
+      throw new Error(error.message);
     }
   }
 }

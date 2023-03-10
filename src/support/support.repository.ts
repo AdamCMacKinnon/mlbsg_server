@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { sendEmail } from '../utils/emailFunctions';
+import { sendEmail } from '../email/emailFunctions';
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { Support } from './support.entity';
@@ -9,13 +9,14 @@ export class SupportRepository extends Repository<Support> {
   async createTicket(createTicketDto: CreateTicketDto): Promise<Support> {
     const { username, email, ticket_body, issue_type } = createTicketDto;
 
+    const userEmail = process.env.TRELLO_EMAIL;
     const emailSubject = issue_type;
     const emailBody = `
     User ${email} reporting issue regarding ${issue_type}:\n
   \t${ticket_body}\n
     \t\tActive username is: ${username}
     `;
-    await sendEmail(emailBody, emailSubject);
+    await sendEmail(userEmail, emailBody, emailSubject);
 
     try {
       const newTicket = this.create({
