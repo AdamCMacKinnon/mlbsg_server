@@ -24,7 +24,7 @@ import { ConfigModule } from '@nestjs/config';
       migrations: ['dist/migrations*.js'],
       autoLoadEntities: true,
       migrationsRun: false,
-      synchronize: true,
+      synchronize: false,
       logging: true,
     }),
     AuthModule,
