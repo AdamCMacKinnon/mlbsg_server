@@ -1,16 +1,23 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { WinstonModule } from 'nest-winston';
-import { transports } from 'winston';
+import { transports, format } from 'winston';
 import { AppModule } from './app.module';
 import { TransformInterceptor } from './transform.interceptor';
+import { logLevels } from './config/LoggerInfo';
 
 async function bootstrap() {
   const port = process.env.PORT || 5000;
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger({
-      // options
-      transports: [new transports.File()],
+      format: format.combine(format.timestamp(), format.json()),
+      levels: logLevels.levels,
+      transports: [
+        new transports.Console(),
+        new transports.File({
+          filename: `logs/logfile-${Date.now()}`,
+        }),
+      ],
     }),
   });
   app.enableCors();
