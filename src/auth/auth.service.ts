@@ -98,7 +98,11 @@ export class AuthService {
 
   async getStandings(): Promise<User[]> {
     try {
-      const userList = await this.usersRepository.find();
+      const userList = await this.usersRepository
+        .createQueryBuilder('user')
+        .select(['username', 'diff', 'isactive'])
+        .where({ isactive: true })
+        .execute();
       Logger.log(`${userList.length} Users returned for Leaderboard`);
       return userList;
     } catch (error) {
