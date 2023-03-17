@@ -1,12 +1,18 @@
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { WinstonModule } from 'nest-winston';
+import { transports } from 'winston';
 import { AppModule } from './app.module';
 import { TransformInterceptor } from './transform.interceptor';
 
 async function bootstrap() {
-  const logger = new Logger();
   const port = process.env.PORT || 5000;
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger({
+      // options
+      transports: [new transports.File()],
+    }),
+  });
   app.enableCors();
   app.useGlobalPipes(
     new ValidationPipe({
@@ -16,6 +22,6 @@ async function bootstrap() {
   );
   app.useGlobalInterceptors(new TransformInterceptor());
   await app.listen(port);
-  logger.log(`Application is up and running on ${port}!`);
+  console.log(`${process.env.STAGE} running on ${port}`);
 }
 bootstrap();
