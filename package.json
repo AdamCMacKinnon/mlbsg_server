@@ -11,7 +11,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "rm -rf logs/* && nest build && jest",
+    "build": "mv -v logs/logfile* logs/archive/ && nest build && jest",
+    "build:local": "mv -v logs/logfile* logs/archive/ && rm -rf logs/archive/* && nest build && jest",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "STAGE=dev nest start --watch",
