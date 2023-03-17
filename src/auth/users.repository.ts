@@ -11,7 +11,7 @@ import { GetUsersFilterDto } from '../admin/dto/get-users-filter.dto';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
-  private logger = new Logger('UsersRepository');
+  private Logger = new Logger('UsersRepository');
   async createUser(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     const { id, username, password, email } = authCredentialsDto;
 

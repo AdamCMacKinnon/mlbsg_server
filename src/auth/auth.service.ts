@@ -15,7 +15,7 @@ import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
 @Injectable()
 export class AuthService {
-  private logger = new Logger('UserService');
+  private Logger = new Logger('UserService');
   constructor(
     @InjectRepository(UsersRepository)
     private usersRepository: UsersRepository,
