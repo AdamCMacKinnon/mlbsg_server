@@ -4,7 +4,7 @@ import { WinstonModule } from 'nest-winston';
 import { transports, format } from 'winston';
 import { AppModule } from './app.module';
 import { TransformInterceptor } from './transform.interceptor';
-import { logLevels } from './config/LoggerInfo';
+import { logLevels } from './loggerInfo';
 
 async function bootstrap() {
   const port = process.env.PORT || 5000;
