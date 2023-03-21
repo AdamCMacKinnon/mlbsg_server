@@ -11,9 +11,10 @@ export class PicksService {
     @InjectRepository(PicksRepository)
     private picksRepository: PicksRepository,
   ) {}
-  async getUserPicks(user: User): Promise<Picks[]> {
+  async getUserPicks(id: string): Promise<Picks[]> {
+    const userId = id;
     const picksList = await this.picksRepository.find({
-      where: { user },
+      where: { userId },
     });
     if (picksList.length === 0) {
       Logger.warn('No Picks returned!');

@@ -17,7 +17,7 @@
     "start": "nest start",
     "start:dev": "find logs -maxdepth 1 -type f -delete && STAGE=dev nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:cat": "STAGE=cat node dist/main",
+    "start:cat": "mv -v logs/* logs/archive || true && STAGE=cat node dist/main",
     "start:prod": "mv -v logs/* logs/archive || true && STAGE=prod node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
