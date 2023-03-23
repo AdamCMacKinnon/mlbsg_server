@@ -1,11 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { PicksModule } from './picks/picks.module';
 import { AdminModule } from './admin/admin.module';
 import { SupportModule } from './support/support.module';
 import { ConfigModule } from '@nestjs/config';
-
 // ONLY set Synchornize to TRUE when schemas are being updated.  Requires separate PR
 
 @Module({
@@ -31,5 +30,6 @@ import { ConfigModule } from '@nestjs/config';
     AdminModule,
     SupportModule,
   ],
+  providers: [Logger],
 })
 export class AppModule {}

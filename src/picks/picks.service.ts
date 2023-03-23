@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../auth/user.entity';
 import { Picks } from '../picks/picks.entity';
@@ -11,15 +11,13 @@ export class PicksService {
     @InjectRepository(PicksRepository)
     private picksRepository: PicksRepository,
   ) {}
-  async getUserPicks(user: User): Promise<Picks[]> {
-    // eslint-disable-next-line prefer-const
-    let { id } = user;
+  async getUserPicks(id: string): Promise<Picks[]> {
+    const userId = id;
     const picksList = await this.picksRepository.find({
-      where: { user },
+      where: { userId },
     });
-    id = user.id;
-    if (!picksList) {
-      throw new NotFoundException(`No picks for user ${id} `);
+    if (picksList.length === 0) {
+      Logger.warn('No Picks returned!');
     }
     return picksList;
   }
