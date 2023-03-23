@@ -1,7 +1,6 @@
 import {
   ConflictException,
   InternalServerErrorException,
-  Logger,
 } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
@@ -11,7 +10,6 @@ import { GetUsersFilterDto } from '../admin/dto/get-users-filter.dto';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
-  private logger = new Logger('UsersRepository');
   async createUser(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     const { id, username, password, email } = authCredentialsDto;
 

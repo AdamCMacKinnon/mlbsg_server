@@ -1,0 +1,102 @@
+[
+  {
+    "username": "testAccount001",
+    "password": "Password001!",
+    "email": "test001@test.com"
+  },
+  {
+    "username": "testAccount002",
+    "password": "Password002!",
+    "email": "test002@test.com"
+  },
+  {
+    "username": "testAccount003",
+    "password": "Password003!",
+    "email": "test003@test.com"
+  },
+  {
+    "username": "testAccount004",
+    "password": "Password004!",
+    "email": "test004@test.com"
+  },
+  {
+    "username": "testAccount005",
+    "password": "Password005!",
+    "email": "test005@test.com"
+  },
+  {
+    "username": "testAccount006",
+    "password": "Password006!",
+    "email": "test006@test.com"
+  },
+  {
+    "username": "testAccount007",
+    "password": "Password007!",
+    "email": "test007@test.com"
+  },
+  {
+    "username": "testAccount008",
+    "password": "Password008!",
+    "email": "test008@test.com"
+  },
+  {
+    "username": "testAccount009",
+    "password": "Password009!",
+    "email": "test009@test.com"
+  },
+  {
+    "username": "testAccount010",
+    "password": "Password010!",
+    "email": "test010@test.com"
+  },
+  {
+    "username": "testAccount011",
+    "password": "Password011!",
+    "email": "test011@test.com"
+  },
+  {
+    "username": "testAccount012",
+    "password": "Password012!",
+    "email": "test012@test.com"
+  },
+  {
+    "username": "testAccount013",
+    "password": "Password013!",
+    "email": "test013@test.com"
+  },
+  {
+    "username": "testAccount014",
+    "password": "Password014!",
+    "email": "test014@test.com"
+  },
+  {
+    "username": "testAccount015",
+    "password": "Password015!",
+    "email": "test015@test.com"
+  },
+  {
+    "username": "testAccount016",
+    "password": "Password016!",
+    "email": "test016@test.com"
+  },
+  {
+    "username": "testAccount017",
+    "password": "Password017!",
+    "email": "test017@test.com"
+  },
+  {
+    "username": "testAccount018",
+    "password": "Password018!",
+    "email": "test018@test.com"
+  },
+  {
+    "username": "testAccount019",
+    "password": "Password019!",
+    "email": "test019@test.com"
+  },
+  {
+    "username": "testAccount020",
+    "password": "Password020!",
+    "email": "test020@test.com"
+  }
+]
