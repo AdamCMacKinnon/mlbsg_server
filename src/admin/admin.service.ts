@@ -87,7 +87,7 @@ export class AdminService {
         Logger.warn(`User Deleted Successfully`);
       }
     } catch (error) {
-      Logger.error(`AN ERROR OCCURED: ${error.message}`);
+      Logger.error(`AN ERROR OCCURED WHILE DELETING USER: ${error.message}`);
       throw 500;
     }
   }
