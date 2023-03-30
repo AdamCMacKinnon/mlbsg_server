@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { User } from '../auth/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { MakePicksDto } from './dto/make-picks.dto';
@@ -36,7 +36,9 @@ export class PicksRepository extends Repository<Picks> {
       Logger.error(
         `An ERROR OCCURED WHILE MAKING PICK FOR ${user.id}: ${error}`,
       );
-      return error;
+      throw new InternalServerErrorException(
+        `Error While Saving User Picks.  Contact Support or Try Again`,
+      );
     }
   }
 }

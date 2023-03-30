@@ -46,11 +46,12 @@ export class AuthService {
         ]);
         return { accessToken, refreshToken };
       } else {
-        throw new UnauthorizedException('Please check your login credentials');
+        throw new UnauthorizedException(
+          'Please check your login credentials.  Usernames and passwords are CaSe SenSiTiVe',
+        );
       }
     } catch (error) {
       Logger.error(`AN ERROR OCCURED IN Login Service: ${error.message}`);
-      throw 500;
     }
   }
 
@@ -75,7 +76,9 @@ export class AuthService {
       Logger.error(
         `AN ERROR OCCURED IN UpdateAccount Service: ${error.message}`,
       );
-      throw 500;
+      throw new NotFoundException(
+        `Error Updating Account Info.  Check credentials ${username} and ${email} is correct.`,
+      );
     }
   }
   async getUserById(id: string): Promise<User> {
@@ -92,7 +95,6 @@ export class AuthService {
       return userById;
     } catch (error) {
       Logger.error(`AN ERROR OCCURED IN GetUserByID Service: ${error.message}`);
-      throw 500;
     }
   }
 
