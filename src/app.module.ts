@@ -5,6 +5,7 @@ import { PicksModule } from './picks/picks.module';
 import { AdminModule } from './admin/admin.module';
 import { SupportModule } from './support/support.module';
 import { ConfigModule } from '@nestjs/config';
+import { HealthModule } from './health/health.module';
 // ONLY set Synchornize to TRUE when schemas are being updated.  Requires separate PR
 
 @Module({
@@ -26,6 +27,7 @@ import { ConfigModule } from '@nestjs/config';
       synchronize: false,
       logging: true,
     }),
+    HealthModule,
     AuthModule,
     AdminModule,
     SupportModule,
