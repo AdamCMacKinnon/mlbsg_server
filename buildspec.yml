@@ -13,3 +13,6 @@ phases:
   post_build:
     commands:
       - echo Build Completed!
+  artifacts:
+    files:
+      - '**/*'
