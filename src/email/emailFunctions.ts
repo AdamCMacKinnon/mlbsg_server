@@ -3,7 +3,8 @@ import * as nodemailer from 'nodemailer';
 
 export async function sendEmail(
   userEmail: string,
-  emailBody: string,
+  emailBodyHtml: string,
+  emailBodyText: string,
   emailSubject: string,
 ) {
   const transporter = nodemailer.createTransport({
@@ -18,7 +19,8 @@ export async function sendEmail(
       from: '"MLBSG Support"<layrfive_mlbsgv2@hotmail.com>',
       to: userEmail,
       subject: emailSubject,
-      text: emailBody,
+      html: emailBodyHtml,
+      text: emailBodyText,
     });
     Logger.log(`Email sent with ID:  ${mailData.messageId}`);
     return mailData;
