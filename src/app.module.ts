@@ -24,7 +24,7 @@ import { HealthModule } from './health/health.module';
       migrations: ['dist/migrations*.js'],
       autoLoadEntities: true,
       migrationsRun: false,
-      synchronize: false,
+      synchronize: true,
       logging: true,
     }),
     HealthModule,
