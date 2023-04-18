@@ -87,7 +87,7 @@ export class AdminService {
         Logger.warn(`User Deleted Successfully`);
       }
     } catch (error) {
-      Logger.error(`AN ERROR OCCURED: ${error.message}`);
+      Logger.error(`AN ERROR OCCURED WHILE DELETING USER: ${error.message}`);
       throw 500;
     }
   }
@@ -104,12 +104,22 @@ export class AdminService {
           emailList.push(users[u].email);
           const userEmail = users[u].email;
           const emailSubject = 'Pick Missing for MLBSG!';
-          const emailBody = `
+          const emailBodyHtml = `
           <h3>Hi ${users[u].username}!</h3>\n  Our records indicate you haven't made a pick this week for\n
           \t\t<i>The MLB Survivor Game!</i>  \nMake sure to get it in for week ${week} before the deadline!  If you believe you have
           received this email in error, <a href="mailto:layrfive_mlbsgv2@hotmail.com">please send us a message!</a>
           `;
-          await sendEmail(userEmail, emailBody, emailSubject);
+          const emailBodyText = `
+          Hi ${users[u].username}!\n  Our records indicate you haven't made a pick this week for\n
+          \t\tThe MLB Survivor Game! <br>Make sure to get it in for week ${week} before the deadline!  <br>If you believe you have
+          received this email in error, you can ignore this email!
+          `;
+          await sendEmail(
+            userEmail,
+            emailBodyHtml,
+            emailBodyText,
+            emailSubject,
+          );
         }
       }
       return emailList;

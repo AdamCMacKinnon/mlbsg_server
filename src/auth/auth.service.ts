@@ -45,13 +45,13 @@ export class AuthService {
           }),
         ]);
         return { accessToken, refreshToken };
-      } else {
-        throw new UnauthorizedException('Please check your login credentials');
       }
     } catch (error) {
       Logger.error(`AN ERROR OCCURED IN Login Service: ${error.message}`);
-      throw 500;
     }
+    throw new UnauthorizedException(
+      'Please check your login credentials.  Usernames and passwords are CaSe SenSiTiVe',
+    );
   }
 
   async updateAccount(userUpdateDto: UserUpdateDto): Promise<User> {
@@ -75,8 +75,10 @@ export class AuthService {
       Logger.error(
         `AN ERROR OCCURED IN UpdateAccount Service: ${error.message}`,
       );
-      throw 500;
     }
+    throw new NotFoundException(
+      `Error Updating Account Info.  Check credentials ${username} and ${email} is correct.`,
+    );
   }
   async getUserById(id: string): Promise<User> {
     try {
@@ -86,13 +88,10 @@ export class AuthService {
         },
       });
       Logger.log(`ID ${userById.id} Returned Successfully`);
-      if (!userById) {
-        throw new NotFoundException('No Such User with that ID!');
-      }
       return userById;
     } catch (error) {
       Logger.error(`AN ERROR OCCURED IN GetUserByID Service: ${error.message}`);
-      throw 500;
+      throw new NotFoundException(`No User with ${id} exists!`);
     }
   }
 
