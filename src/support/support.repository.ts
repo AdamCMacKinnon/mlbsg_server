@@ -11,12 +11,17 @@ export class SupportRepository extends Repository<Support> {
 
     const userEmail = process.env.TRELLO_EMAIL;
     const emailSubject = issue_type;
-    const emailBody = `
+    const emailBodyHtml = `
     User ${email} reporting issue regarding ${issue_type}:\n
   \t${ticket_body}\n
     \t\tActive username is: ${username}
     `;
-    await sendEmail(userEmail, emailBody, emailSubject);
+    const emailBodyText = `
+    User ${email} reporting issue regarding ${issue_type}:\n
+  \t${ticket_body}\n
+    \t\tActive username is: ${username}
+    `;
+    await sendEmail(userEmail, emailBodyHtml, emailBodyText, emailSubject);
 
     try {
       const newTicket = this.create({
