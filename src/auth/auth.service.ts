@@ -33,7 +33,7 @@ export class AuthService {
       const { username, password, email } = authCredentialsDto;
       let { id } = authCredentialsDto;
       const user = await this.usersRepository.findOne({
-        where: [{ email: email }, { username: username }],
+        where: [{ email: email }, { username: username.toLowerCase() }],
       });
       id = user.id;
       if (user && (await bcrypt.compare(password, user.password))) {
