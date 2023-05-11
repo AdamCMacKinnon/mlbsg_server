@@ -95,23 +95,6 @@ export class AuthService {
     }
   }
 
-  async getStandings(): Promise<User[]> {
-    try {
-      const userList = await this.usersRepository
-        .createQueryBuilder('user')
-        .select(['username', 'diff', 'isactive'])
-        .where({ isactive: true })
-        .execute();
-      Logger.log(`${userList.length} Users returned for Leaderboard`);
-      return userList;
-    } catch (error) {
-      Logger.error(
-        `AN ERROR OCCURED IN GetStandings Service: ${error.message}`,
-      );
-      throw 500;
-    }
-  }
-
   async refreshToken(id: string, refreshToken: string) {
     const user = await this.getUserById(id);
     if (!user) {
