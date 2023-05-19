@@ -28,16 +28,24 @@ export class DataService {
   }
 
   async getPicksDistro(): Promise<string[]> {
-    const distro = await this.usersRepository.query(
-      `
-      SELECT COUNT(dist.total), picks.pick, primary_color, secondary_color
-      FROM (SELECT COUNT(pick) AS total, pick AS team FROM picks GROUP BY pick) AS dist
-      JOIN picks ON picks.pick=dist.team
-      JOIN team_colors ON team_colors.team_name=dist.team
-      GROUP BY picks.pick, primary_color, secondary_color
-      ORDER BY COUNT(dist.total) DESC;
-      `,
-    );
-    return distro;
+    try {
+      const distro = await this.usersRepository.query(
+        `
+        SELECT COUNT(dist.total), picks.pick, primary_color, secondary_color
+        FROM (SELECT COUNT(pick) AS total, pick AS team FROM picks GROUP BY pick) AS dist
+        JOIN picks ON picks.pick=dist.team
+        JOIN team_colors ON team_colors.team_name=dist.team
+        GROUP BY picks.pick, primary_color, secondary_color
+        ORDER BY COUNT(dist.total) DESC;
+        `,
+      );
+      return distro;
+    } catch (error) {
+      if (error.code === '42601') {
+        Logger.warn('SQL Syntax Error in Distro Query.');
+      }
+      Logger.error(`THERE WAS AN ERROR GETTING TEAM DISTRO LIST: ${error}`);
+      return error;
+    }
   }
 }

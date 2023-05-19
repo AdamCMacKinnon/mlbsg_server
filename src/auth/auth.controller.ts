@@ -19,10 +19,6 @@ export class AuthController {
   ): Promise<{ refreshToken: string }> {
     return this.authService.refreshToken(id, refreshToken);
   }
-  @Get('/standings')
-  getStandings(): Promise<User[]> {
-    return this.authService.getStandings();
-  }
   @Post('/register')
   register(@Body() authCredentialsDto: AuthCredentialsDto): Promise<void> {
     return this.authService.register(authCredentialsDto);
