@@ -33,7 +33,7 @@ export class AuthService {
       const { username, password, email } = authCredentialsDto;
       let { id } = authCredentialsDto;
       const user = await this.usersRepository.findOne({
-        where: [{ email: email }, { username: username }],
+        where: [{ email: email }, { username: username.toLowerCase() }],
       });
       id = user.id;
       if (user && (await bcrypt.compare(password, user.password))) {
@@ -92,23 +92,6 @@ export class AuthService {
     } catch (error) {
       Logger.error(`AN ERROR OCCURED IN GetUserByID Service: ${error.message}`);
       throw new NotFoundException(`No User with ${id} exists!`);
-    }
-  }
-
-  async getStandings(): Promise<User[]> {
-    try {
-      const userList = await this.usersRepository
-        .createQueryBuilder('user')
-        .select(['username', 'diff', 'isactive'])
-        .where({ isactive: true })
-        .execute();
-      Logger.log(`${userList.length} Users returned for Leaderboard`);
-      return userList;
-    } catch (error) {
-      Logger.error(
-        `AN ERROR OCCURED IN GetStandings Service: ${error.message}`,
-      );
-      throw 500;
     }
   }
 
