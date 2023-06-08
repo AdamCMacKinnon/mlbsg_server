@@ -4,9 +4,7 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
-  Post,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -48,9 +46,5 @@ export class AdminController {
     id: string,
   ): Promise<void> {
     return this.adminService.deleteUser(id);
-  }
-  @Post('/email/empty')
-  emailEmptyUsers(@Body('week', ParseIntPipe) week: number): Promise<User[]> {
-    return this.adminService.emailEmptyUsers(week);
   }
 }
