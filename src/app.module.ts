@@ -3,10 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { PicksModule } from './picks/picks.module';
 import { AdminModule } from './admin/admin.module';
-import { SupportModule } from './support/support.module';
 import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
 import { DataModule } from './data/data.module';
+import { LeagueModule } from './league/league.module';
+import { EmailModule } from './email/email.module';
 // ONLY set Synchornize to TRUE when schemas are being updated.  Requires separate PR
 
 @Module({
@@ -25,14 +26,15 @@ import { DataModule } from './data/data.module';
       migrations: ['dist/migrations*.js'],
       autoLoadEntities: true,
       migrationsRun: false,
-      synchronize: false,
+      synchronize: true,
       logging: true,
     }),
     HealthModule,
     AuthModule,
     AdminModule,
-    SupportModule,
     DataModule,
+    LeagueModule,
+    EmailModule,
   ],
   providers: [Logger],
 })
