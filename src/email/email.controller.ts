@@ -1,6 +1,6 @@
 import { Body, Controller, ParseIntPipe, Post } from '@nestjs/common';
 import { EmailService } from './email.service';
-import { CreateTicketDto } from '../support/dto/create-ticket.dto';
+import { CreateTicketDto } from './dto/create-ticket.dto';
 
 @Controller('email')
 export class EmailController {

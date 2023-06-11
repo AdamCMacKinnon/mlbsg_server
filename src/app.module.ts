@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { PicksModule } from './picks/picks.module';
 import { AdminModule } from './admin/admin.module';
-import { SupportModule } from './support/support.module';
 import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from './health/health.module';
 import { DataModule } from './data/data.module';

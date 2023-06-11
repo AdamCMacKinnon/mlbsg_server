@@ -1,4 +1,4 @@
-import { CreateTicketDto } from '../support/dto/create-ticket.dto';
+import { CreateTicketDto } from './dto/create-ticket.dto';
 
 const date = new Date();
 date.setDate(date.getDate() + 1);

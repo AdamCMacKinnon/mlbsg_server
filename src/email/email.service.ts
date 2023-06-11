@@ -12,7 +12,7 @@ import {
   userStatusText,
 } from './email.content';
 import { EmailType } from './enum/email.enum';
-import { CreateTicketDto } from '../support/dto/create-ticket.dto';
+import { CreateTicketDto } from './dto/create-ticket.dto';
 
 @Injectable()
 export class EmailService {
@@ -125,7 +125,7 @@ export class EmailService {
     }
   }
   async createTicket(createTicketDto: CreateTicketDto): Promise<void> {
-    const userEmail = createTicketDto.email;
+    const userEmail = process.env.TRELLO_EMAIL;
     const username = createTicketDto.username;
     const emailType = EmailType.support;
     const emailBodyHtml = supportTicketHtml(createTicketDto);
