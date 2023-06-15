@@ -11,7 +11,7 @@ export class LeagueService {
     private leagueRepository: LeagueRepository,
   ) {}
 
-  async dailyLeagueUpdate(date: string, week: number): Promise<string> {
+  async dailyLeagueUpdate(date: any, week: number): Promise<string> {
     const url = `${baseUrl}/${currentDayEndpoint}&startDate=${date}&endDate=${date}`;
     console.log(url);
     try {
