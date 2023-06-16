@@ -18,25 +18,30 @@ export class LeagueService {
       const response = await axios.get(url);
       const data = response.data.dates[0].games;
       for (let x = 0; x < data.length; x++) {
-        const gamePk = data[x].gamePk;
-        const homeTeam = data[x].teams.home.team.name;
-        const homeScore = data[x].teams.home.score;
-        const homeDiff = data[x].teams.home.score - data[x].teams.away.score;
-        const awayTeam = data[x].teams.away.team.name;
-        const awayScore = data[x].teams.away.score;
-        const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
+        if (data[x].status.statusCode === 'I') {
+          const gamePk = data[x].gamePk;
+          const homeTeam = data[x].teams.home.team.name;
+          const homeScore = data[x].teams.home.score;
+          const homeDiff = data[x].teams.home.score - data[x].teams.away.score;
+          const awayTeam = data[x].teams.away.team.name;
+          const awayScore = data[x].teams.away.score;
+          const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
 
-        await this.leagueRepository.dailyResults(
-          date,
-          week,
-          gamePk,
-          homeTeam,
-          homeScore,
-          homeDiff,
-          awayTeam,
-          awayScore,
-          awayDiff,
-        );
+          await this.leagueRepository.dailyResults(
+            date,
+            week,
+            gamePk,
+            homeTeam,
+            homeScore,
+            homeDiff,
+            awayTeam,
+            awayScore,
+            awayDiff,
+          );
+        } else {
+          Logger.warn(`Game ${data[x].gamePk} Has not started yet`);
+          x++;
+        }
       }
       return data;
     } catch (error) {

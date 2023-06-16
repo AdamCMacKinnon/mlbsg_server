@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { JobType } from './enum/jobType.enum';
 
 @Entity('batch')
 export class Batch {
@@ -6,11 +13,11 @@ export class Batch {
   job_id: string;
 
   @Column()
-  job_type: string;
+  job_type: JobType;
 
-  @Column({ type: 'timestamp', precision: 3 })
-  time_start: Date;
+  @CreateDateColumn({ type: 'timestamp', precision: 3 })
+  job_start: Date;
 
-  @Column({ type: 'timestamp', precision: 3 })
-  time_end: Date;
+  @UpdateDateColumn({ type: 'timestamp', precision: 3 })
+  job_end: Date;
 }
