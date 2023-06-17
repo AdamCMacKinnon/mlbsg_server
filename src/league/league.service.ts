@@ -11,32 +11,52 @@ export class LeagueService {
     private leagueRepository: LeagueRepository,
   ) {}
 
-  async dailyLeagueUpdate(date: string, week: number): Promise<string> {
+  async dailyLeagueUpdate(date: any, week: number): Promise<string> {
     const url = `${baseUrl}/${currentDayEndpoint}&startDate=${date}&endDate=${date}`;
     console.log(url);
     try {
       const response = await axios.get(url);
       const data = response.data.dates[0].games;
       for (let x = 0; x < data.length; x++) {
-        const gamePk = data[x].gamePk;
-        const homeTeam = data[x].teams.home.team.name;
-        const homeScore = data[x].teams.home.score;
-        const homeDiff = data[x].teams.home.score - data[x].teams.away.score;
-        const awayTeam = data[x].teams.away.team.name;
-        const awayScore = data[x].teams.away.score;
-        const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
+        if (data[x].status.statusCode === 'I' || 'F') {
+          const gamePk = data[x].gamePk;
+          const homeTeam = data[x].teams.home.team.name;
+          const homeScore = data[x].teams.home.score;
+          const homeDiff = data[x].teams.home.score - data[x].teams.away.score;
+          const awayTeam = data[x].teams.away.team.name;
+          const awayScore = data[x].teams.away.score;
+          const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
 
-        await this.leagueRepository.dailyResults(
-          date,
-          week,
-          gamePk,
-          homeTeam,
-          homeScore,
-          homeDiff,
-          awayTeam,
-          awayScore,
-          awayDiff,
-        );
+          await this.leagueRepository.dailyResults(
+            date,
+            week,
+            gamePk,
+            homeTeam,
+            homeScore,
+            homeDiff,
+            awayTeam,
+            awayScore,
+            awayDiff,
+          );
+        } else if (data[x].status.statusCode === 'DR') {
+          Logger.warn(`Game ${data[x].gamePk} Has been Postponed`);
+          const gamePPD = 'Postponed Game';
+          const gamePk = data[x].gamePk;
+          const homeTeam = data[x].teams.home.team.name;
+          const awayTeam = data[x].teams.away.team.name;
+          await this.leagueRepository.query(
+            `
+            INSERT INTO game_data_rejects
+            (game_pk, game_date, week, home_team, away_team, error_message)
+            VALUES
+            ($1, $2, $3, $4, $5, $6)
+            `,
+            [gamePk, date, week, homeTeam, awayTeam, gamePPD],
+          );
+        } else {
+          Logger.warn(`Game ${data[x].gamePk} Has not started yet`);
+          x++;
+        }
       }
       return data;
     } catch (error) {
