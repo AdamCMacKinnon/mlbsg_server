@@ -18,7 +18,7 @@ export class LeagueService {
       const response = await axios.get(url);
       const data = response.data.dates[0].games;
       for (let x = 0; x < data.length; x++) {
-        if (data[x].status.statusCode === 'I' || 'F') {
+        if (data[x].teams.home.score && data[x].teams.away.score) {
           const gamePk = data[x].gamePk;
           const homeTeam = data[x].teams.home.team.name;
           const homeScore = data[x].teams.home.score;
@@ -50,6 +50,7 @@ export class LeagueService {
             (game_pk, game_date, week, home_team, away_team, error_message)
             VALUES
             ($1, $2, $3, $4, $5, $6)
+            ON CONFLICT DO NOTHING
             `,
             [gamePk, date, week, homeTeam, awayTeam, gamePPD],
           );
