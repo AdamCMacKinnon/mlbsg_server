@@ -26,7 +26,7 @@ import { EmailModule } from './email/email.module';
       migrations: ['dist/migrations*.js'],
       autoLoadEntities: true,
       migrationsRun: false,
-      synchronize: true,
+      synchronize: false,
       logging: true,
     }),
     HealthModule,
