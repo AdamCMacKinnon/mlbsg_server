@@ -18,7 +18,7 @@ export class LeagueService {
       const response = await axios.get(url);
       const data = response.data.dates[0].games;
       for (let x = 0; x < data.length; x++) {
-        if (data[x].status.statusCode === 'I') {
+        if (data[x].status.statusCode === 'I' || 'F') {
           const gamePk = data[x].gamePk;
           const homeTeam = data[x].teams.home.team.name;
           const homeScore = data[x].teams.home.score;
@@ -37,6 +37,21 @@ export class LeagueService {
             awayTeam,
             awayScore,
             awayDiff,
+          );
+        } else if (data[x].status.statusCode === 'DR') {
+          Logger.warn(`Game ${data[x].gamePk} Has been Postponed`);
+          const gamePPD = 'Postponed Game';
+          const gamePk = data[x].gamePk;
+          const homeTeam = data[x].teams.home.team.name;
+          const awayTeam = data[x].teams.away.team.name;
+          await this.leagueRepository.query(
+            `
+            INSERT INTO game_data_rejects
+            (game_pk, game_date, week, home_team, away_team, error_message)
+            VALUES
+            ($1, $2, $3, $4, $5, $6)
+            `,
+            [gamePk, date, week, homeTeam, awayTeam, gamePPD],
           );
         } else {
           Logger.warn(`Game ${data[x].gamePk} Has not started yet`);
