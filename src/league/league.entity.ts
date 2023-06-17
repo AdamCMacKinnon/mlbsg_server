@@ -14,18 +14,18 @@ export class League {
   @Column()
   home_team: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: 0 })
   home_score: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ nullable: true, default: 0 })
   home_diff: number;
 
   @Column()
   away_team: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: 0 })
   away_score: number;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ nullable: true, default: 0 })
   away_diff: number;
 }
