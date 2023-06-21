@@ -15,9 +15,9 @@ export class BatchService {
     private batchRepository: BatchRepository,
   ) {}
   // runs every 5 minutes every day between 11am to midnight
-  // @Cron('0 */5 11-23 * * *', { name: 'daily_score_updates' })
+  @Cron('0 */5 11-23 * * *', { name: 'daily_score_updates' })
   // for testing on local, uncomment below line (runs every minute)
-  @Cron(CronExpression.EVERY_30_SECONDS, { name: 'daily_score_updates' })
+  // @Cron(CronExpression.EVERY_30_SECONDS, { name: 'daily_score_updates' })
   async getApiData() {
     Logger.log('Daily League Job');
     const jobType = JobType.daily_api_update;
