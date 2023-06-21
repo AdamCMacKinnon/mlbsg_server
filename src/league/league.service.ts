@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { LeagueRepository } from './league.repository';
 import { baseUrl, currentDayEndpoint } from '../utils/mlb.api';
 import axios from 'axios';
+import { BatchRepository } from '../batch/batch.repository';
 
 @Injectable()
 export class LeagueService {
   constructor(
     @InjectRepository(LeagueRepository)
     private leagueRepository: LeagueRepository,
+    @InjectRepository(BatchRepository)
+    private batchRepository: BatchRepository,
   ) {}
 
   async dailyLeagueUpdate(date: any, week: number): Promise<string> {
@@ -50,7 +53,7 @@ export class LeagueService {
             (game_pk, game_date, week, home_team, away_team, error_message)
             VALUES
             ($1, $2, $3, $4, $5, $6)
-            ON CONFLICT DO NOTHING
+            ON CONFLICT UPDATE
             `,
             [gamePk, date, week, homeTeam, awayTeam, gamePPD],
           );
@@ -95,6 +98,55 @@ export class LeagueService {
       return query;
     } catch (error) {
       Logger.error(`ERROR WITH DIFF QUERY: ${error}`);
+    }
+  }
+  async diffByTeam(week: number, team: string): Promise<string> {
+    if (!team) {
+      const query = await this.leagueRepository.query(
+        `
+        WITH teams AS (
+          SELECT game_data.game_pk, home_team AS team, home_diff AS run_diff
+          FROM game_data
+		      WHERE week=$1
+          UNION ALL
+          SELECT game_pk, away_team, away_diff
+          FROM game_data
+
+          ) 
+          SELECT team, SUM(run_diff) AS diff
+          FROM teams
+          JOIN game_data
+          ON teams.game_pk=game_data.game_pk
+		      WHERE week = $1
+          GROUP BY team;
+        `,
+        [week],
+      );
+      return query;
+    } else {
+      const query = await this.leagueRepository.query(
+        `
+        WITH teams AS (
+          SELECT game_data.game_pk, home_team AS team, home_diff AS run_diff
+          FROM game_data
+		      WHERE week=$1
+          UNION ALL
+          SELECT game_pk, away_team, away_diff
+          FROM game_data
+
+          ) 
+          SELECT team, SUM(run_diff) AS diff
+          FROM teams
+          JOIN game_data
+          ON teams.game_pk=game_data.game_pk
+		      WHERE team LIKE '%' || $2 || '%'
+		      AND week = $1
+          GROUP BY team;
+        `,
+        [week, team],
+      );
+      console.log(query);
+      return query;
     }
   }
 }
