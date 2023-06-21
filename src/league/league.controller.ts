@@ -1,4 +1,11 @@
-import { Controller, Post, Body, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  ParseIntPipe,
+  Param,
+} from '@nestjs/common';
 import { LeagueService } from './league.service';
 
 @Controller('league')
@@ -15,5 +22,12 @@ export class LeagueController {
   @Post('/userUpdates')
   updateUserDiffs(@Body('week', ParseIntPipe) week: number): Promise<string[]> {
     return this.leagueService.updateUserDiffs(week);
+  }
+  @Get('/diffByTeam/:week/:team?')
+  diffsByTeam(
+    @Param('week', ParseIntPipe) week: number,
+    @Param('team') team?: string,
+  ): Promise<string> {
+    return this.leagueService.diffByTeam(week, team);
   }
 }

@@ -31,7 +31,10 @@ export class BatchService {
   }
 
   // runs at 5AM to get the previous days results if the game passes the daily updates.
-  @Cron('0 05 * * *', { name: 'prevous_day_cleanup' })
+  @Cron('0 05 * * *', {
+    name: 'prevous_day_cleanup',
+    timeZone: 'America/New_York',
+  })
   async prevDay() {
     Logger.log('Daily Score cleanup job');
     const jobType = JobType.daily_api_cleanup;
