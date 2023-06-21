@@ -107,17 +107,18 @@ export class LeagueService {
         WITH teams AS (
           SELECT game_data.game_pk, home_team AS team, home_diff AS run_diff
           FROM game_data
+		      WHERE week=$1
           UNION ALL
           SELECT game_pk, away_team, away_diff
           FROM game_data
-          WHERE week=$1
+
           ) 
           SELECT team, SUM(run_diff) AS diff
           FROM teams
           JOIN game_data
           ON teams.game_pk=game_data.game_pk
-          GROUP BY team
-          ORDER BY SUM(run_diff) DESC;
+		      WHERE week = $1
+          GROUP BY team;
         `,
         [week],
       );
@@ -128,16 +129,18 @@ export class LeagueService {
         WITH teams AS (
           SELECT game_data.game_pk, home_team AS team, home_diff AS run_diff
           FROM game_data
+		      WHERE week=$1
           UNION ALL
           SELECT game_pk, away_team, away_diff
           FROM game_data
-          WHERE week=$1
+
           ) 
           SELECT team, SUM(run_diff) AS diff
           FROM teams
           JOIN game_data
           ON teams.game_pk=game_data.game_pk
 		      WHERE team LIKE '%' || $2 || '%'
+		      AND week = $1
           GROUP BY team;
         `,
         [week, team],
