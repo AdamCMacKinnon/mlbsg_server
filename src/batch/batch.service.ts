@@ -39,7 +39,6 @@ export class BatchService {
     const getData = this.schedulerRegistry.getCronJob('daily_score_updates');
     getData.start();
     await this.batchRepository.batchJobData(jobType);
-    getData.stop();
   }
 
   // runs at 5AM to get the previous days results if the game passes the daily updates.
@@ -56,7 +55,6 @@ export class BatchService {
     const cleanup = this.schedulerRegistry.getCronJob('previous_day_cleanup');
     cleanup.start();
     await this.batchRepository.batchJobData(jobType);
-    cleanup.stop();
   }
 
   // runs every Monday at 7am that updates the diff column on the user table.
@@ -69,7 +67,6 @@ export class BatchService {
     const diffupdate = this.schedulerRegistry.getCronJob('user_update');
     diffupdate.start();
     await this.batchRepository.batchJobData(jobType);
-    diffupdate.stop();
   }
   /**
    * EMAIL CRON JOBS
@@ -90,7 +87,6 @@ export class BatchService {
     const emailBlanks = this.schedulerRegistry.getCronJob('blank_active_users');
     emailBlanks.start();
     await this.batchRepository.batchJobData(jobType);
-    emailBlanks.stop();
   }
 
   // runs Monday at 9AM, one time.
@@ -107,6 +103,5 @@ export class BatchService {
     const emailStatus = this.schedulerRegistry.getCronJob('user_status');
     emailStatus.start();
     await this.batchRepository.batchJobData(jobType);
-    emailStatus.stop();
   }
 }
