@@ -1,4 +1,4 @@
-CREATE TABLE team_colors (
+CREATE TABLE IF NOT EXISTS team_colors (
     team_name character varying,
     primary_color character varying,
     primary_name character varying,
@@ -41,3 +41,7 @@ VALUES
 ('Texas Rangers','#C0111F','Red','#003278','Blue'),
 ('Toronto Blue Jays','#134A8E','Blue','#1D2D5C','Navy Blue'),
 ('Washington Nationals','#AB0003','Red','#14225A','Navy Blue')
+
+ON CONFLICT UPDATE
+
+COMMIT;
