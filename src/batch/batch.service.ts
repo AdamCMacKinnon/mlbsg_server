@@ -21,14 +21,13 @@ export class BatchService {
    * daily_score_updates = gets live scores and game data
    * previous_day_cleanup = runs one time request to ensure previous day's data is fully updated
    * user_update = updates run differential on user table
+   * ** For local testing, use CronExpression Enum for every 30 seconds.
    */
   // runs every 10 minutes every day between 11am to midnight
   @Cron('0 */10 11-23 * * *', {
     name: 'daily_score_updates',
     timeZone: 'America/New_York',
   })
-  // for testing on local, uncomment below line (runs every minute)
-  // @Cron(CronExpression.EVERY_30_SECONDS, { name: 'daily_score_updates' })
   async getApiData() {
     Logger.log('Daily League Job');
     const jobType = JobType.daily_api_update;
@@ -42,7 +41,7 @@ export class BatchService {
   }
 
   // runs at 5AM to get the previous days results if the game passes the daily updates.
-  @Cron('0 05 * * *', {
+  @Cron('0 5 * * *', {
     name: 'prevous_day_cleanup',
     timeZone: 'America/New_York',
   })
@@ -91,7 +90,6 @@ export class BatchService {
 
   // runs Monday at 9AM, one time.
   @Cron('0 0 09 * * 1', {
-    // @Cron(CronExpression.EVERY_30_SECONDS, {
     name: 'user_status',
     timeZone: 'America/New_York',
   })
