@@ -1,2 +1,0 @@
-Files in this folder are static tables that are imported to the database via CSV files.  They are usually hand-gathered data that does not need to be updated dynamically at any point.
-They are excluded from migrations or sycnrhonization to reduce potential overwriting/sync issues.
