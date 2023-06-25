@@ -1,4 +1,4 @@
-CREATE TABLE game_data_rejects (
+CREATE TABLE IF NOT EXISTS game_data_rejects (
     game_pk integer,
     game_date date,
     week integer,
@@ -6,3 +6,5 @@ CREATE TABLE game_data_rejects (
     away_team character varying,
     error_message character varying
 )
+
+COMMIT;

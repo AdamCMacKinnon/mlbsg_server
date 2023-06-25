@@ -60,7 +60,7 @@ export class LeagueRepository extends Repository<League> {
       await this.query(
         `
         UPDATE public.user AS u
-        SET diff = $1
+        SET diff = diff + $1
         FROM picks AS p
         WHERE p."userId" = u.id
           AND u.isactive = true

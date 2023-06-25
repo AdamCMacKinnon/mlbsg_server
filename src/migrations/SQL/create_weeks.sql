@@ -1,4 +1,4 @@
-CREATE TABLE schedule_weeks(
+CREATE TABLE IF NOT EXISTS schedule_weeks(
     week integer,
     start_date date,
     end_date date
@@ -34,3 +34,7 @@ VALUES
 (23,'2023-09-11','2023-09-17'),
 (24,'2023-09-18','2023-09-24'),
 (25,'2023-09-25','2023-10-01')
+
+ON CONFLICT UPDATE
+
+COMMIT;
