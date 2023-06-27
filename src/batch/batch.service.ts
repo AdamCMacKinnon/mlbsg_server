@@ -96,10 +96,14 @@ export class BatchService {
   async sendUserStatus() {
     const jobType = JobType.email_status;
     const date = format(new Date(), 'yyyy-LL-dd');
-    const week = await this.batchRepository.getWeekQuery(date);
+    const week = (await this.batchRepository.getWeekQuery(date)) - 1;
     await this.emailService.emailUserStatus(week);
     const emailStatus = this.schedulerRegistry.getCronJob('user_status');
     emailStatus.start();
     await this.batchRepository.batchJobData(jobType);
   }
+
+  /**
+   * ELIMINATION JOB
+   */
 }
