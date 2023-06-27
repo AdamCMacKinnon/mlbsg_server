@@ -57,18 +57,32 @@ export class LeagueRepository extends Repository<League> {
             `,
         [diff, team, week],
       );
-      await this.query(
-        `
-        UPDATE public.user AS u
-        SET diff = diff + $1
-        FROM picks AS p
-        WHERE p."userId" = u.id
-          AND u.isactive = true
-          AND p.pick = $2
-          AND p.week = $3
-        `,
-        [diff, team, week],
-      );
+      if (diff > 0) {
+        await this.query(
+          `
+          UPDATE public.user AS u
+          SET diff = diff + $1
+          FROM picks AS p
+          WHERE p."userId" = u.id
+            AND u.isactive = true
+            AND p.pick = $2
+            AND p.week = $3
+          `,
+          [diff, team, week],
+        );
+      } else {
+        await this.query(
+          `
+          UPDATE public.user AS u
+          SET diff = diff + $1, isactive = false
+          FROM picks AS p
+          WHERE p."userId" = u.id
+            AND p.pick = $2
+            AND p.week = $3
+          `,
+          [diff, team, week],
+        );
+      }
     } catch (error) {
       Logger.error(`Error updating user diff: ${error}`);
       return error;
