@@ -53,7 +53,7 @@ export class LeagueService {
             (game_pk, game_date, week, home_team, away_team, error_message)
             VALUES
             ($1, $2, $3, $4, $5, $6)
-            ON CONFLICT UPDATE
+            ON CONFLICT DO NOTHING
             `,
             [gamePk, date, week, homeTeam, awayTeam, gamePPD],
           );
@@ -101,52 +101,57 @@ export class LeagueService {
     }
   }
   async diffByTeam(week: number, team: string): Promise<string> {
-    if (!team) {
-      const query = await this.leagueRepository.query(
-        `
-        WITH teams AS (
-          SELECT game_data.game_pk, home_team AS team, home_diff AS run_diff
-          FROM game_data
-		      WHERE week=$1
-          UNION ALL
-          SELECT game_pk, away_team, away_diff
-          FROM game_data
-
-          ) 
-          SELECT team, SUM(run_diff) AS diff
-          FROM teams
-          JOIN game_data
-          ON teams.game_pk=game_data.game_pk
-		      WHERE week = $1
-          GROUP BY team;
-        `,
-        [week],
-      );
-      return query;
-    } else {
-      const query = await this.leagueRepository.query(
-        `
-        WITH teams AS (
-          SELECT game_data.game_pk, home_team AS team, home_diff AS run_diff
-          FROM game_data
-		      WHERE week=$1
-          UNION ALL
-          SELECT game_pk, away_team, away_diff
-          FROM game_data
-
-          ) 
-          SELECT team, SUM(run_diff) AS diff
-          FROM teams
-          JOIN game_data
-          ON teams.game_pk=game_data.game_pk
-		      WHERE team LIKE '%' || $2 || '%'
-		      AND week = $1
-          GROUP BY team;
-        `,
-        [week, team],
-      );
-      console.log(query);
-      return query;
+    try {
+      if (!team) {
+        const query = await this.leagueRepository.query(
+          `
+          WITH teams AS (
+            SELECT game_data.game_pk, home_team AS team, home_diff AS run_diff
+            FROM game_data
+            WHERE week=$1
+            UNION ALL
+            SELECT game_pk, away_team, away_diff
+            FROM game_data
+  
+            ) 
+            SELECT team, SUM(run_diff) AS diff
+            FROM teams
+            JOIN game_data
+            ON teams.game_pk=game_data.game_pk
+            WHERE week = $1
+            GROUP BY team;
+          `,
+          [week],
+        );
+        return query;
+      } else {
+        const query = await this.leagueRepository.query(
+          `
+          WITH teams AS (
+            SELECT game_data.game_pk, home_team AS team, home_diff AS run_diff
+            FROM game_data
+            WHERE week=$1
+            UNION ALL
+            SELECT game_pk, away_team, away_diff
+            FROM game_data
+  
+            ) 
+            SELECT team, SUM(run_diff) AS diff
+            FROM teams
+            JOIN game_data
+            ON teams.game_pk=game_data.game_pk
+            WHERE team LIKE '%' || $2 || '%'
+            AND week = $1
+            GROUP BY team;
+          `,
+          [week, team],
+        );
+        console.log(query);
+        return query;
+      }
+    } catch (error) {
+      Logger.error(`ERROR WHILE UPDATING TEAM DIFFS: ${error}`);
+      return error;
     }
   }
 }
