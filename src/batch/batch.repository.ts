@@ -2,6 +2,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { Batch } from './batch.entity';
 import { JobType } from './enum/jobType.enum';
 import { Logger } from '@nestjs/common';
+import { JobStatus } from './enum/jobStatus.enum';
 
 @EntityRepository(Batch)
 export class BatchRepository extends Repository<Batch> {
@@ -16,10 +17,11 @@ export class BatchRepository extends Repository<Batch> {
     );
     return week[0].week;
   }
-  async batchJobData(jobType: JobType): Promise<void> {
+  async batchJobData(jobType: JobType, jobStatus: JobStatus): Promise<void> {
     try {
       const batch = this.create({
         job_type: jobType,
+        job_status: jobStatus,
       });
       await this.save(batch);
     } catch (error) {

@@ -5,4 +5,5 @@ export enum EmailType {
   password = 'password',
   pick_list = 'pick_list',
   support = 'support_ticket',
+  batch_alert = 'batch_alert',
 }

@@ -13,6 +13,7 @@ import {
 } from './email.content';
 import { EmailType } from './enum/email.enum';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { JobType } from '../batch/enum/jobType.enum';
 
 @Injectable()
 export class EmailService {
@@ -131,6 +132,22 @@ export class EmailService {
     const emailBodyHtml = supportTicketHtml(createTicketDto);
     const emailBodyText = supportTicketText(createTicketDto);
     const emailSubject = 'Support Email for MLBSG!';
+    await this.sendEmail(
+      userEmail,
+      username,
+      emailBodyHtml,
+      emailBodyText,
+      emailSubject,
+      emailType,
+    );
+  }
+  async batchAlert(jobType: JobType): Promise<void> {
+    const userEmail = process.env.TRELLO_API_EMAIL;
+    const username = 'batch alert';
+    const emailType = EmailType.batch_alert;
+    const emailBodyHtml = `Batch Job ${jobType} FAILURE alert at ${new Date()}`;
+    const emailBodyText = `Batch Job ${jobType} FAILURE alert at ${new Date()}`;
+    const emailSubject = 'Batch alert!!';
     await this.sendEmail(
       userEmail,
       username,
