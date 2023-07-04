@@ -25,8 +25,7 @@ export class BatchService {
    * ** For local testing, use CronExpression Enum for every 30 seconds.
    */
   // runs every 10 minutes every day between 11am to midnight
-  // @Cron('0 */10 11-23 * * *', {
-  @Cron(CronExpression.EVERY_30_SECONDS, {
+  @Cron('0 */10 11-23 * * *', {
     name: 'daily_score_updates',
     timeZone: 'America/New_York',
   })
@@ -55,37 +54,35 @@ export class BatchService {
   })
   async prevDay() {
     Logger.log('Daily Score cleanup job');
-    let jobStatus: JobStatus;
     const jobType = JobType.daily_api_cleanup;
     const date = format(endOfYesterday(), 'yyyy-LL-dd');
     const week = await this.batchRepository.getWeekQuery(date);
     const updateCall = await this.leagueService.dailyLeagueUpdate(date, week);
     const cleanup = this.schedulerRegistry.getCronJob('previous_day_cleanup');
     cleanup.start();
-    if (!updateCall) {
-      JobStatus.failure;
-    } else {
-      JobStatus.success;
-    }
+    const jobStatus =
+      updateCall.length > 0 ? JobStatus.success : JobStatus.failure;
     await this.batchRepository.batchJobData(jobType, jobStatus);
+    if (jobStatus === JobStatus.failure) {
+      await this.emailService.batchAlert(jobType);
+    }
   }
 
   // runs every Monday at 7am that updates the diff column on the user table.
   @Cron('0 0 07 * * 1', { name: 'user_update', timeZone: 'America/New_York' })
   async updateUserbase() {
     const jobType = JobType.user_diff_update;
-    let jobStatus: JobStatus;
     const date = format(endOfYesterday(), 'yyyy-LL-dd');
     const week = await this.batchRepository.getWeekQuery(date);
     const userUpdate = await this.leagueService.updateUserDiffs(week);
     const diffupdate = this.schedulerRegistry.getCronJob('user_update');
     diffupdate.start();
-    if (!userUpdate) {
-      JobStatus.failure;
-    } else {
-      JobStatus.success;
-    }
+    const jobStatus =
+      userUpdate.length > 0 ? JobStatus.success : JobStatus.failure;
     await this.batchRepository.batchJobData(jobType, jobStatus);
+    if (jobStatus === JobStatus.failure) {
+      await this.emailService.batchAlert(jobType);
+    }
   }
   /**
    * EMAIL CRON JOBS
@@ -100,18 +97,17 @@ export class BatchService {
   })
   async alertBlankUsers() {
     const jobType = JobType.email_blank;
-    let jobStatus: JobStatus;
     const date = format(new Date(), 'yyyy-LL-dd');
     const week = (await this.batchRepository.getWeekQuery(date)) - 1;
     const emailUsers = await this.emailService.emailBlankUsers(week);
     const emailBlanks = this.schedulerRegistry.getCronJob('blank_active_users');
     emailBlanks.start();
-    if (!emailUsers) {
-      JobStatus.failure;
-    } else {
-      JobStatus.success;
-    }
+    const jobStatus =
+      emailUsers.length > 0 ? JobStatus.success : JobStatus.failure;
     await this.batchRepository.batchJobData(jobType, jobStatus);
+    if (jobStatus === JobStatus.failure) {
+      await this.emailService.batchAlert(jobType);
+    }
   }
 
   // runs Monday at 9AM, one time.
@@ -121,21 +117,16 @@ export class BatchService {
   })
   async sendUserStatus() {
     const jobType = JobType.email_status;
-    let jobStatus: JobStatus;
     const date = format(new Date(), 'yyyy-LL-dd');
     const week = await this.batchRepository.getWeekQuery(date);
     const userStatus = await this.emailService.emailUserStatus(week);
     const emailStatus = this.schedulerRegistry.getCronJob('user_status');
     emailStatus.start();
-    if (!userStatus) {
-      JobStatus.failure;
-    } else {
-      JobStatus.success;
-    }
+    const jobStatus =
+      userStatus.length > 0 ? JobStatus.success : JobStatus.failure;
     await this.batchRepository.batchJobData(jobType, jobStatus);
+    if (jobStatus === JobStatus.failure) {
+      await this.emailService.batchAlert(jobType);
+    }
   }
-
-  /**
-   * ELIMINATION JOB
-   */
 }
