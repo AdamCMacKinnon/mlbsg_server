@@ -4,5 +4,5 @@
  * depending on use case.
  */
 
-export const baseUrl = 'https://statsapi.mlb.com/api/v1';
+export const baseUrl = 'https://statsapi.mlb.com/api/v2';
 export const currentDayEndpoint = 'schedule?sportId=1';
