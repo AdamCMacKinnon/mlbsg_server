@@ -36,7 +36,6 @@ export class BatchService {
     const week = await this.batchRepository.getWeekQuery(date);
     console.log(week);
     const apiCall = await this.leagueService.dailyLeagueUpdate(date, week);
-    console.log(apiCall);
     const getData = this.schedulerRegistry.getCronJob('daily_score_updates');
     getData.start();
     const jobStatus =
