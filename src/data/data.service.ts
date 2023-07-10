@@ -31,6 +31,24 @@ export class DataService {
     }
   }
 
+  async getTotalUserDiff(): Promise<User[]> {
+    try {
+      const totalList = await this.usersRepository.query(
+        `
+        SELECT username, diff
+        FROM public.user
+        JOIN picks ON public.user.id=picks."userId"
+        GROUP BY public.user.id
+        ORDER BY diff DESC;
+        `,
+      );
+      return totalList;
+    } catch (error) {
+      Logger.error(`ERROR IN TOTAL RUN DIFF QUERY: ${error.message}`);
+      throw 500;
+    }
+  }
+
   async getPicksDistro(): Promise<string[]> {
     try {
       const distro = await this.usersRepository.query(

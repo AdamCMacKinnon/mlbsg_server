@@ -10,6 +10,10 @@ export class DataController {
   getStandings(): Promise<User[]> {
     return this.dataService.getStandings();
   }
+  @Get('/userDiffs')
+  getTotalUserDiff(): Promise<User[]> {
+    return this.dataService.getTotalUserDiff();
+  }
   @Get('/distro')
   getPicksDistro(): Promise<string[]> {
     return this.dataService.getPicksDistro();
