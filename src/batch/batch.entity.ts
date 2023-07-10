@@ -5,28 +5,23 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { SupportType } from './enums/types.enums';
+import { JobType } from './enum/jobType.enum';
+import { JobStatus } from './enum/jobStatus.enum';
 
-@Entity()
-export class Support {
+@Entity('batch')
+export class Batch {
   @PrimaryGeneratedColumn('uuid')
-  ticketId: string;
-
-  @Column({ nullable: true })
-  username: string;
+  job_id: string;
 
   @Column()
-  email: string;
+  job_type: JobType;
 
   @Column()
-  issue_type: SupportType;
-
-  @Column()
-  ticket_body: string;
+  job_status: JobStatus;
 
   @CreateDateColumn({ type: 'timestamp', precision: 3 })
-  createdAt: Date;
+  job_start: Date;
 
   @UpdateDateColumn({ type: 'timestamp', precision: 3 })
-  updatedAt: Date;
+  job_end: Date;
 }

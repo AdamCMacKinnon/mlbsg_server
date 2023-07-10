@@ -1,4 +1,4 @@
-import { SupportType } from '../enums/types.enums';
+import { SupportType } from '../enum/types.enums';
 
 export class CreateTicketDto {
   username?: string;

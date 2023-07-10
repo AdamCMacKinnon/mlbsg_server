@@ -2,12 +2,16 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersRepository } from '../auth/users.repository';
 import { User } from '../auth/user.entity';
+import { PicksRepository } from '../picks/picks.repository';
+import { Picks } from '../picks/picks.entity';
 
 @Injectable()
 export class DataService {
   constructor(
     @InjectRepository(User)
     private usersRepository: UsersRepository,
+    @InjectRepository(Picks)
+    private picksRepository: PicksRepository,
   ) {}
 
   async getStandings(): Promise<User[]> {
@@ -23,6 +27,24 @@ export class DataService {
       Logger.error(
         `AN ERROR OCCURED IN GetStandings Service: ${error.message}`,
       );
+      throw 500;
+    }
+  }
+
+  async getTotalUserDiff(): Promise<User[]> {
+    try {
+      const totalList = await this.usersRepository.query(
+        `
+        SELECT username, diff
+        FROM public.user
+        JOIN picks ON public.user.id=picks."userId"
+        GROUP BY public.user.id
+        ORDER BY diff DESC;
+        `,
+      );
+      return totalList;
+    } catch (error) {
+      Logger.error(`ERROR IN TOTAL RUN DIFF QUERY: ${error.message}`);
       throw 500;
     }
   }
@@ -45,6 +67,34 @@ export class DataService {
         Logger.warn('SQL Syntax Error in Distro Query.');
       }
       Logger.error(`THERE WAS AN ERROR GETTING TEAM DISTRO LIST: ${error}`);
+      return error;
+    }
+  }
+
+  async totalRuns(week: number): Promise<string[]> {
+    try {
+      const totals = await this.picksRepository.query(
+        `
+        WITH teams AS (
+          SELECT game_data.game_pk, home_team AS team, home_score AS score
+          FROM game_data
+          UNION ALL
+          SELECT game_pk, away_team, away_score
+          FROM game_data
+          WHERE week=$1
+          ) 
+          SELECT team, SUM(score)
+          FROM teams
+          JOIN game_data
+          ON teams.game_pk=game_data.game_pk
+          GROUP BY team
+          ORDER BY team ASC;
+        `,
+        [week],
+      );
+      return totals;
+    } catch (error) {
+      Logger.error(`ERROR IN RUN TOTALS QUERY: ${error}`);
       return error;
     }
   }
