@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LeagueRepository } from './league.repository';
-import { baseUrl, currentDayEndpoint } from '../utils/mlb.api';
+import { baseUrl, currentDayEndpoint } from '../utils/globals';
 import axios from 'axios';
 import { BatchRepository } from '../batch/batch.repository';
+import { season } from '../utils/globals';
 
 @Injectable()
 export class LeagueService {
@@ -14,11 +15,7 @@ export class LeagueService {
     private batchRepository: BatchRepository,
   ) {}
 
-  async dailyLeagueUpdate(
-    date: any,
-    week: number,
-    season: string,
-  ): Promise<string> {
+  async dailyLeagueUpdate(date: any, week: number): Promise<string> {
     const url = `${baseUrl}/${currentDayEndpoint}&startDate=${date}&endDate=${date}`;
     console.log(url);
     try {
@@ -60,7 +57,7 @@ export class LeagueService {
             ($1, $2, $3, $4, $5, $6)
             ON CONFLICT DO NOTHING
             `,
-            [gamePk, date, week, homeTeam, awayTeam, gamePPD],
+            [gamePk, date, week, homeTeam, awayTeam, gamePPD, season],
           );
         } else {
           Logger.warn(`Game ${data[x].gamePk} Has not started yet`);
@@ -74,7 +71,7 @@ export class LeagueService {
     }
   }
 
-  async updateUserDiffs(week: number, season: string): Promise<string[]> {
+  async updateUserDiffs(week: number): Promise<string[]> {
     try {
       // testing in local, i'm not sure this "WHERE/AND" clause... does anything?  Working as-is for now
       // TODO: test in cloud env's to ensure proper data is being pulled when adding the SEASON param.
@@ -128,9 +125,10 @@ export class LeagueService {
             JOIN game_data
             ON teams.game_pk=game_data.game_pk
             WHERE week = $1
+            AND season = $2
             GROUP BY team;
           `,
-          [week],
+          [week, season],
         );
         return query;
       } else {
@@ -151,9 +149,10 @@ export class LeagueService {
             ON teams.game_pk=game_data.game_pk
             WHERE team LIKE '%' || $2 || '%'
             AND week = $1
+            AND season = $3
             GROUP BY team;
           `,
-          [week, team],
+          [week, team, season],
         );
         console.log(query);
         return query;

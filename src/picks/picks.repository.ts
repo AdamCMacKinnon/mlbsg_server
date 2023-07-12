@@ -4,6 +4,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { MakePicksDto } from './dto/make-picks.dto';
 import { Picks } from './picks.entity';
 import { getPickId } from './pickIdGenerator';
+import { season } from '../utils/globals';
 
 @EntityRepository(Picks)
 export class PicksRepository extends Repository<Picks> {
@@ -18,7 +19,6 @@ export class PicksRepository extends Repository<Picks> {
     }
   }
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
-    const season = `${process.env.CURR_SEASON}-${process.env.CURR_RUN}`;
     try {
       const { week, pick } = makePicksDto;
       const pickId = await getPickId(user);
