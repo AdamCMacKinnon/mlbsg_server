@@ -18,6 +18,7 @@ export class PicksRepository extends Repository<Picks> {
     }
   }
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
+    const season = `${process.env.CURR_SEASON}-${process.env.CURR_RUN}`;
     try {
       const { week, pick } = makePicksDto;
       const pickId = await getPickId(user);
@@ -26,6 +27,7 @@ export class PicksRepository extends Repository<Picks> {
         week,
         pick,
         user,
+        season,
       });
       Logger.log(
         `PICK ID:${userPick.pickId}, WEEK:${userPick.week}, TEAM: ${userPick.pick}, USER: ${user.username}!`,

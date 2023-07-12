@@ -14,7 +14,11 @@ export class LeagueService {
     private batchRepository: BatchRepository,
   ) {}
 
-  async dailyLeagueUpdate(date: any, week: number): Promise<string> {
+  async dailyLeagueUpdate(
+    date: any,
+    week: number,
+    season: string,
+  ): Promise<string> {
     const url = `${baseUrl}/${currentDayEndpoint}&startDate=${date}&endDate=${date}`;
     console.log(url);
     try {
@@ -40,6 +44,7 @@ export class LeagueService {
             awayTeam,
             awayScore,
             awayDiff,
+            season,
           );
         } else if (data[x].status.statusCode === 'DR') {
           Logger.warn(`Game ${data[x].gamePk} Has been Postponed`);
@@ -69,8 +74,10 @@ export class LeagueService {
     }
   }
 
-  async updateUserDiffs(week: number): Promise<string[]> {
+  async updateUserDiffs(week: number, season: string): Promise<string[]> {
     try {
+      // testing in local, i'm not sure this "WHERE/AND" clause... does anything?  Working as-is for now
+      // TODO: test in cloud env's to ensure proper data is being pulled when adding the SEASON param.
       const query = await this.leagueRepository.query(
         `
         WITH teams AS (
@@ -80,6 +87,7 @@ export class LeagueService {
           SELECT game_pk, away_team, away_diff
           FROM game_data
           WHERE week=$1
+          AND season=$2
           ) 
           SELECT team, SUM(run_diff) AS diff
           FROM teams
@@ -88,12 +96,13 @@ export class LeagueService {
           GROUP BY team
           ORDER BY SUM(run_diff) DESC;
         `,
-        [week],
+        [week, season],
       );
+      console.log(query);
       for (let q = 0; q < query.length; q++) {
         const team = query[q].team;
         const diff = query[q].diff;
-        await this.leagueRepository.updateUserDiff(diff, team, week);
+        await this.leagueRepository.updateUserDiff(diff, team, week, season);
       }
       return query;
     } catch (error) {

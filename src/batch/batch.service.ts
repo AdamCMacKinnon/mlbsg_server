@@ -34,8 +34,12 @@ export class BatchService {
     const jobType = JobType.daily_api_update;
     const date = format(new Date(), 'yyyy-LL-dd');
     const week = await this.batchRepository.getWeekQuery(date);
-    console.log(week);
-    const apiCall = await this.leagueService.dailyLeagueUpdate(date, week);
+    const season = `${process.env.CURR_SEASON}-${process.env.CURR_RUN}`;
+    const apiCall = await this.leagueService.dailyLeagueUpdate(
+      date,
+      week,
+      season,
+    );
     const getData = this.schedulerRegistry.getCronJob('daily_score_updates');
     getData.start();
     const jobStatus =
@@ -56,7 +60,12 @@ export class BatchService {
     const jobType = JobType.daily_api_cleanup;
     const date = format(endOfYesterday(), 'yyyy-LL-dd');
     const week = await this.batchRepository.getWeekQuery(date);
-    const updateCall = await this.leagueService.dailyLeagueUpdate(date, week);
+    const season = `${process.env.CURR_SEASON}-${process.env.CURR_RUN}`;
+    const updateCall = await this.leagueService.dailyLeagueUpdate(
+      date,
+      week,
+      season,
+    );
     const cleanup = this.schedulerRegistry.getCronJob('previous_day_cleanup');
     cleanup.start();
     const jobStatus =
@@ -73,7 +82,8 @@ export class BatchService {
     const jobType = JobType.user_diff_update;
     const date = format(endOfYesterday(), 'yyyy-LL-dd');
     const week = await this.batchRepository.getWeekQuery(date);
-    const userUpdate = await this.leagueService.updateUserDiffs(week);
+    const season = `${process.env.CURR_SEASON}-${process.env.CURR_RUN}`;
+    const userUpdate = await this.leagueService.updateUserDiffs(week, season);
     const diffupdate = this.schedulerRegistry.getCronJob('user_update');
     diffupdate.start();
     const jobStatus =

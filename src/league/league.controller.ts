@@ -17,11 +17,13 @@ export class LeagueController {
     @Body('date') date: string,
     @Body('week', ParseIntPipe) week: number,
   ): Promise<string> {
-    return this.leagueService.dailyLeagueUpdate(date, week);
+    const season = `${process.env.CURR_SEASON}-${process.env.CURR_RUN}`;
+    return this.leagueService.dailyLeagueUpdate(date, week, season);
   }
   @Post('/userUpdates')
   updateUserDiffs(@Body('week', ParseIntPipe) week: number): Promise<string[]> {
-    return this.leagueService.updateUserDiffs(week);
+    const season = `${process.env.CURR_SEASON}-${process.env.CURR_RUN}`;
+    return this.leagueService.updateUserDiffs(week, season);
   }
   @Get('/diffByTeam/:week/:team?')
   diffsByTeam(

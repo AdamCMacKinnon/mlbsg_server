@@ -19,6 +19,9 @@ export class Picks {
   @Column()
   userId: string;
 
+  @Column({ default: process.env.CURR_SEASON })
+  season: string;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, (user) => user.picks, { eager: false })
   @Exclude({ toPlainOnly: true })
