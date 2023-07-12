@@ -52,12 +52,12 @@ export class LeagueService {
           await this.leagueRepository.query(
             `
             INSERT INTO game_data_rejects
-            (game_pk, game_date, week, home_team, away_team, error_message)
+            (game_pk, game_date, week, season, home_team, away_team, error_message)
             VALUES
-            ($1, $2, $3, $4, $5, $6)
+            ($1, $2, $3, $4, $5, $6, $7)
             ON CONFLICT DO NOTHING
             `,
-            [gamePk, date, week, homeTeam, awayTeam, gamePPD, season],
+            [gamePk, date, week, season, homeTeam, awayTeam, gamePPD],
           );
         } else {
           Logger.warn(`Game ${data[x].gamePk} Has not started yet`);

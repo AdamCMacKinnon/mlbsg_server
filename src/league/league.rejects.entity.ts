@@ -12,6 +12,9 @@ export class LeagueRejects {
   week: number;
 
   @Column()
+  season: string;
+
+  @Column()
   home_team: string;
 
   @Column()
