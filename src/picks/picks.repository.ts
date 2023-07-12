@@ -4,6 +4,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { MakePicksDto } from './dto/make-picks.dto';
 import { Picks } from './picks.entity';
 import { getPickId } from './pickIdGenerator';
+import { season } from '../utils/globals';
 
 @EntityRepository(Picks)
 export class PicksRepository extends Repository<Picks> {
@@ -26,6 +27,7 @@ export class PicksRepository extends Repository<Picks> {
         week,
         pick,
         user,
+        season,
       });
       Logger.log(
         `PICK ID:${userPick.pickId}, WEEK:${userPick.week}, TEAM: ${userPick.pick}, USER: ${user.username}!`,

@@ -28,11 +28,15 @@ export class User {
   @Column({ default: true })
   isactive: boolean;
 
+  @Exclude()
   @Column({ default: Role.player })
   role: Role;
 
   @Column({ default: 0 })
   diff: number;
+
+  @Column({ default: 0 })
+  career_diff: number;
 
   @Exclude({ toPlainOnly: true })
   @CreateDateColumn({ type: 'timestamp', precision: 3 })

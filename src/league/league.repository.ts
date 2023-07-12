@@ -14,6 +14,7 @@ export class LeagueRepository extends Repository<League> {
     awayTeam: string,
     awayScore: number,
     awayDiff: number,
+    season: string,
   ): Promise<void> {
     try {
       const game = this.create({
@@ -26,6 +27,7 @@ export class LeagueRepository extends Repository<League> {
         away_team: awayTeam,
         away_score: awayScore,
         away_diff: awayDiff,
+        season: season,
       });
       await this.save(game);
     } catch (error) {
@@ -46,6 +48,7 @@ export class LeagueRepository extends Repository<League> {
     diff: number,
     team: string,
     week: number,
+    season: string,
   ): Promise<void> {
     try {
       await this.query(
@@ -54,33 +57,39 @@ export class LeagueRepository extends Repository<League> {
             SET run_diff = $1
             WHERE pick = $2
             AND week = $3
+            AND season = $4
             `,
-        [diff, team, week],
+        [diff, team, week, season],
       );
       if (diff > 0) {
         await this.query(
           `
           UPDATE public.user AS u
-          SET diff = diff + $1
+          SET diff = diff + $1, 
+            career_diff = career_diff + $1
           FROM picks AS p
           WHERE p."userId" = u.id
             AND u.isactive = true
             AND p.pick = $2
             AND p.week = $3
+            AND p.season = $4
           `,
-          [diff, team, week],
+          [diff, team, week, season],
         );
       } else {
         await this.query(
           `
           UPDATE public.user AS u
-          SET diff = diff + $1, isactive = false
+          SET diff = diff + $1, 
+            isactive = false, 
+            career_diff = career_diff + $1
           FROM picks AS p
           WHERE p."userId" = u.id
             AND p.pick = $2
             AND p.week = $3
+            AND p.season = $4
           `,
-          [diff, team, week],
+          [diff, team, week, season],
         );
       }
     } catch (error) {

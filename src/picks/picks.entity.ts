@@ -1,6 +1,7 @@
 import { User } from '../auth/user.entity';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import { season } from '../utils/globals';
 
 @Entity()
 export class Picks {
@@ -18,6 +19,9 @@ export class Picks {
 
   @Column()
   userId: string;
+
+  @Column({ default: `${season}` })
+  season: string;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, (user) => user.picks, { eager: false })
