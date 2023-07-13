@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LeagueRepository } from './league.repository';
-import { baseUrl, currentDayEndpoint } from '../utils/mlb.api';
+import { baseUrl, currentDayEndpoint } from '../utils/globals';
 import axios from 'axios';
 import { BatchRepository } from '../batch/batch.repository';
+import { season } from '../utils/globals';
 
 @Injectable()
 export class LeagueService {
@@ -40,6 +41,7 @@ export class LeagueService {
             awayTeam,
             awayScore,
             awayDiff,
+            season,
           );
         } else if (data[x].status.statusCode === 'DR') {
           Logger.warn(`Game ${data[x].gamePk} Has been Postponed`);
@@ -50,12 +52,12 @@ export class LeagueService {
           await this.leagueRepository.query(
             `
             INSERT INTO game_data_rejects
-            (game_pk, game_date, week, home_team, away_team, error_message)
+            (game_pk, game_date, week, season, home_team, away_team, error_message)
             VALUES
-            ($1, $2, $3, $4, $5, $6)
+            ($1, $2, $3, $4, $5, $6, $7)
             ON CONFLICT DO NOTHING
             `,
-            [gamePk, date, week, homeTeam, awayTeam, gamePPD],
+            [gamePk, date, week, season, homeTeam, awayTeam, gamePPD],
           );
         } else {
           Logger.warn(`Game ${data[x].gamePk} Has not started yet`);
@@ -71,6 +73,8 @@ export class LeagueService {
 
   async updateUserDiffs(week: number): Promise<string[]> {
     try {
+      // testing in local, i'm not sure this "WHERE/AND" clause... does anything?  Working as-is for now
+      // TODO: test in cloud env's to ensure proper data is being pulled when adding the SEASON param.
       const query = await this.leagueRepository.query(
         `
         WITH teams AS (
@@ -80,6 +84,7 @@ export class LeagueService {
           SELECT game_pk, away_team, away_diff
           FROM game_data
           WHERE week=$1
+          AND season=$2
           ) 
           SELECT team, SUM(run_diff) AS diff
           FROM teams
@@ -88,12 +93,13 @@ export class LeagueService {
           GROUP BY team
           ORDER BY SUM(run_diff) DESC;
         `,
-        [week],
+        [week, season],
       );
+      console.log(query);
       for (let q = 0; q < query.length; q++) {
         const team = query[q].team;
         const diff = query[q].diff;
-        await this.leagueRepository.updateUserDiff(diff, team, week);
+        await this.leagueRepository.updateUserDiff(diff, team, week, season);
       }
       return query;
     } catch (error) {
@@ -119,9 +125,10 @@ export class LeagueService {
             JOIN game_data
             ON teams.game_pk=game_data.game_pk
             WHERE week = $1
+            AND season = $2
             GROUP BY team;
           `,
-          [week],
+          [week, season],
         );
         return query;
       } else {
@@ -142,9 +149,10 @@ export class LeagueService {
             ON teams.game_pk=game_data.game_pk
             WHERE team LIKE '%' || $2 || '%'
             AND week = $1
+            AND season = $3
             GROUP BY team;
           `,
-          [week, team],
+          [week, team, season],
         );
         console.log(query);
         return query;

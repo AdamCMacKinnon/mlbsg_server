@@ -2,6 +2,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { Email } from './email.entity';
 import { EmailType } from './enum/email.enum';
 import { Logger } from '@nestjs/common';
+import { season } from '../utils/globals';
 
 @EntityRepository(Email)
 export class EmailRepository extends Repository<Email> {
@@ -33,8 +34,10 @@ export class EmailRepository extends Repository<Email> {
         FROM public.user
         JOIN picks ON public.user.id=picks."userId"
         WHERE isactive=true
+        AND picks.season=$1
         GROUP BY id;
         `,
+        [season],
       );
       return users;
     } catch (error) {
@@ -49,8 +52,9 @@ export class EmailRepository extends Repository<Email> {
         FROM public.user
         JOIN picks ON public.user.id=picks."userId"
         WHERE picks.week = $1;
+        AND picks.season = $2
         `,
-        [week],
+        [week, season],
       );
       return userList;
     } catch (error) {

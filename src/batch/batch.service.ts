@@ -7,7 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BatchRepository } from './batch.repository';
 import { EmailService } from '../email/email.service';
 import { JobStatus } from './enum/jobStatus.enum';
-// import { dateForApi } from '../utils/api.params';
 @Injectable()
 export class BatchService {
   constructor(
@@ -34,7 +33,6 @@ export class BatchService {
     const jobType = JobType.daily_api_update;
     const date = format(new Date(), 'yyyy-LL-dd');
     const week = await this.batchRepository.getWeekQuery(date);
-    console.log(week);
     const apiCall = await this.leagueService.dailyLeagueUpdate(date, week);
     const getData = this.schedulerRegistry.getCronJob('daily_score_updates');
     getData.start();
