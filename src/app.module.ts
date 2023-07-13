@@ -26,7 +26,7 @@ import { BatchModule } from './batch/batch.module';
       migrations: ['dist/migrations*.js'],
       autoLoadEntities: true,
       migrationsRun: false,
-      synchronize: true,
+      synchronize: false,
       logging: true,
     }),
     BatchModule,
