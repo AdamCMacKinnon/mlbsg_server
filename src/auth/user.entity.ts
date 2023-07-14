@@ -28,7 +28,6 @@ export class User {
   @Column({ default: true })
   isactive: boolean;
 
-  @Exclude()
   @Column({ default: Role.player })
   role: Role;
 
