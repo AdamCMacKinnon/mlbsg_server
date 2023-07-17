@@ -13,6 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
+import { season } from '../utils/globals';
 @Injectable()
 export class AuthService {
   private Logger = new Logger('UserService');
@@ -81,12 +82,20 @@ export class AuthService {
     );
   }
   async getUserById(id: string): Promise<User> {
+    // this array just holds the past season picks.  no real functional purpose.
+    const pastSeason = [];
     try {
       const userById = await this.usersRepository.findOne({
         where: {
           id: id,
         },
       });
+      // this is super duper ugly, but day of second run, it will work.
+      for (let p = 0; p < userById.picks.length; p++) {
+        if (userById.picks[p].season !== season) {
+          pastSeason.push(userById.picks[p]) && userById.picks.splice(p, 1);
+        }
+      }
       Logger.log(`ID ${userById.id} Returned Successfully`);
       return userById;
     } catch (error) {
