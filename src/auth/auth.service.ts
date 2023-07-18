@@ -82,18 +82,16 @@ export class AuthService {
     );
   }
   async getUserById(id: string): Promise<User> {
-    // this array just holds the past season picks.  no real functional purpose.
-    const pastSeason = [];
     try {
       const userById = await this.usersRepository.findOne({
         where: {
           id: id,
         },
       });
-      // this is super duper ugly, but day of second run, it will work.
+      // this is super duper ugly, but it will work for now
       for (let p = 0; p < userById.picks.length; p++) {
         if (userById.picks[p].season !== season) {
-          pastSeason.push(userById.picks[p]) && userById.picks.splice(p, 1);
+          userById.picks.splice(p);
         }
       }
       Logger.log(`ID ${userById.id} Returned Successfully`);
