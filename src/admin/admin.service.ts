@@ -6,6 +6,7 @@ import { UsersRepository } from '../auth/users.repository';
 import { UpdateDiffDto } from './dto/update-diff.dto';
 import { PicksRepository } from '../picks/picks.repository';
 import { Picks } from '../picks/picks.entity';
+import { season } from '../utils/globals';
 
 @Injectable()
 export class AdminService {
@@ -27,6 +28,12 @@ export class AdminService {
         id: id,
       },
     });
+    // this is super duper ugly, but it will work for now
+    for (let p = userById.picks.length - 1; p >= 0; --p) {
+      if (userById.picks[p].season !== season) {
+        userById.picks.splice(p, 1);
+      }
+    }
     return userById;
   }
   async elimByUsername(usernames: string[]) {
