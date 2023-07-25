@@ -29,9 +29,9 @@ export class AdminService {
       },
     });
     // this is super duper ugly, but it will work for now
-    for (let p = 0; p < userById.picks.length; p++) {
+    for (let p = userById.picks.length - 1; p >= 0; --p) {
       if (userById.picks[p].season !== season) {
-        userById.picks.splice(p);
+        userById.picks.splice(p, 1);
       }
     }
     return userById;
