@@ -44,9 +44,8 @@ export class BatchService {
     }
   }
 
-  // runs at 5AM to get the previous days results if the game passes the daily updates.
-  // @Cron('0 7 * * *', {
-  @Cron(CronExpression.EVERY_30_SECONDS, {
+  // runs at 7AM to get the previous days results if the game passes the daily updates.
+  @Cron('0 7 * * *', {
     name: 'previous_day_cleanup',
     timeZone: 'America/New_York',
   })
