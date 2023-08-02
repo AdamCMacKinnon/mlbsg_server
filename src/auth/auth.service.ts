@@ -14,6 +14,7 @@ import { JwtPayload } from './jwt-payload.interface';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
 import { season } from '../utils/globals';
+import { EmailService } from '../email/email.service';
 @Injectable()
 export class AuthService {
   private Logger = new Logger('UserService');
@@ -21,10 +22,15 @@ export class AuthService {
     @InjectRepository(UsersRepository)
     private usersRepository: UsersRepository,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async register(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    return this.usersRepository.createUser(authCredentialsDto);
+    await this.usersRepository.createUser(authCredentialsDto);
+    await this.emailService.welcomeEmail(
+      authCredentialsDto.email,
+      authCredentialsDto.username,
+    );
   }
 
   async login(

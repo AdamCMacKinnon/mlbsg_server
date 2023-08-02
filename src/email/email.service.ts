@@ -10,6 +10,8 @@ import {
   supportTicketText,
   userStatusHtml,
   userStatusText,
+  welcomeEmailHtml,
+  welcomeEmailText,
 } from './email.content';
 import { EmailType } from './enum/email.enum';
 import { CreateTicketDto } from './dto/create-ticket.dto';
@@ -148,6 +150,20 @@ export class EmailService {
     const emailBodyHtml = `Batch Job ${jobType} FAILURE alert at ${new Date()}`;
     const emailBodyText = `Batch Job ${jobType} FAILURE alert at ${new Date()}`;
     const emailSubject = 'Batch alert!!';
+    await this.sendEmail(
+      userEmail,
+      username,
+      emailBodyHtml,
+      emailBodyText,
+      emailSubject,
+      emailType,
+    );
+  }
+  async welcomeEmail(userEmail: string, username: string) {
+    const emailType = EmailType.registration;
+    const emailBodyHtml = welcomeEmailHtml(username);
+    const emailBodyText = welcomeEmailText(username);
+    const emailSubject = 'Welcome to MLBSG!';
     await this.sendEmail(
       userEmail,
       username,
