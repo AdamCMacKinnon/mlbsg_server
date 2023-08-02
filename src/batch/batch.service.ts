@@ -54,7 +54,7 @@ export class BatchService {
     Logger.log('Daily Score cleanup job');
     const jobType = JobType.daily_api_cleanup;
     const date = format(subDays(new Date(), 1), 'yyyy-LL-dd');
-    console.log(date);
+    Logger.log(`Getting Game Data for ${date}`);
     const week = await this.batchRepository.getWeekQuery(date);
     const updateCall = await this.leagueService.dailyLeagueUpdate(date, week);
     const cleanup = this.schedulerRegistry.getCronJob('previous_day_cleanup');
