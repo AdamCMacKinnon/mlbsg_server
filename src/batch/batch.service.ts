@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { LeagueService } from '../league/league.service';
-import { format, endOfYesterday } from 'date-fns';
+import { format, endOfYesterday, subDays } from 'date-fns';
 import { JobType } from './enum/jobType.enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BatchRepository } from './batch.repository';
@@ -24,7 +24,7 @@ export class BatchService {
    * ** For local testing, use CronExpression Enum for every 30 seconds.
    */
   // runs every 10 minutes every day between 11am to midnight
-  @Cron('0 */10 11-23 * * *', {
+  @Cron('0 */10 * * * *', {
     name: 'daily_score_updates',
     timeZone: 'America/New_York',
   })
@@ -44,15 +44,16 @@ export class BatchService {
     }
   }
 
-  // runs at 5AM to get the previous days results if the game passes the daily updates.
-  @Cron('0 5 * * *', {
+  // runs at 7AM to get the previous days results if the game passes the daily updates.
+  @Cron('0 7 * * *', {
     name: 'previous_day_cleanup',
     timeZone: 'America/New_York',
   })
   async prevDay() {
     Logger.log('Daily Score cleanup job');
     const jobType = JobType.daily_api_cleanup;
-    const date = format(endOfYesterday(), 'yyyy-LL-dd');
+    const date = format(subDays(new Date(), 1), 'yyyy-LL-dd');
+    Logger.log(`Getting Game Data for ${date}`);
     const week = await this.batchRepository.getWeekQuery(date);
     const updateCall = await this.leagueService.dailyLeagueUpdate(date, week);
     const cleanup = this.schedulerRegistry.getCronJob('previous_day_cleanup');
