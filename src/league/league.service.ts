@@ -30,6 +30,7 @@ export class LeagueService {
         const awayTeam = data[x].teams.away.team.name;
         const awayScore = data[x].teams.away.score;
         const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
+        const errorCode = data[x].status.statusCode;
         switch (data[x].status.statusCode) {
           case 'I':
             Logger.log(`Game ${gamePk} is in progress!`);
@@ -53,7 +54,6 @@ export class LeagueService {
             Logger.warn(`Game ${gamePk} has not started yet`);
             break;
           case 'DR':
-            let gameError = 'Game Postponed';
             Logger.warn(
               `Game ${gamePk} between ${homeTeam} and ${awayTeam} has been postponed`,
             );
@@ -65,14 +65,13 @@ export class LeagueService {
               ($1, $2, $3, $4, $5, $6, $7)
               ON CONFLICT DO NOTHING
               `,
-              [gamePk, date, week, season, homeTeam, awayTeam, gameError],
+              [gamePk, date, week, season, homeTeam, awayTeam, errorCode],
             );
             break;
           case 'PW':
             Logger.log(`Game ${gamePk} is in Warmup right now.`);
             break;
           default:
-            gameError = 'Unknown Game Code';
             Logger.warn(`Game ${gamePk} Unknown Status Code!`);
             await this.leagueRepository.query(
               `
@@ -82,7 +81,7 @@ export class LeagueService {
               ($1, $2, $3, $4, $5, $6, $7)
               ON CONFLICT DO NOTHING
               `,
-              [gamePk, date, week, season, homeTeam, awayTeam, gameError],
+              [gamePk, date, week, season, homeTeam, awayTeam, errorCode],
             );
             break;
         }

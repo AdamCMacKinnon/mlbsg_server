@@ -23,8 +23,8 @@ export class BatchService {
    * user_update = updates run differential on user table
    * ** For local testing, use CronExpression Enum for every 30 seconds.
    */
-  // runs every 10 minutes every day between 11am to midnight
-  @Cron('0 */2 * * * *', {
+  // runs every 10 minutes every day
+  @Cron('0 */10 * * * *', {
     name: 'daily_score_updates',
     timeZone: 'America/New_York',
   })
