@@ -71,6 +71,9 @@ export class LeagueService {
           case 'PW':
             Logger.log(`Game ${gamePk} is in Warmup right now.`);
             break;
+          case 'P':
+            Logger.log(`Game ${gamePk} is in Pre-Game Status`);
+            break;
           default:
             Logger.warn(`Game ${gamePk} Unknown Status Code!`);
             await this.leagueRepository.query(
