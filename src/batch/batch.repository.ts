@@ -15,7 +15,11 @@ export class BatchRepository extends Repository<Batch> {
       `,
       [date],
     );
-    return week[0].week;
+    if (!week) {
+      return 0;
+    } else {
+      return week[0].week;
+    }
   }
   async batchJobData(jobType: JobType, jobStatus: JobStatus): Promise<void> {
     try {

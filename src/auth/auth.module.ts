@@ -7,6 +7,7 @@ import { UsersRepository } from './users.repository';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { RefreshTokenStrategy } from './jwt-refresh.strategy';
+import { BatchRepository } from '../batch/batch.repository';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { RefreshTokenStrategy } from './jwt-refresh.strategy';
         expiresIn: 3600,
       },
     }),
-    TypeOrmModule.forFeature([UsersRepository]),
+    TypeOrmModule.forFeature([UsersRepository, BatchRepository]),
   ],
   providers: [AuthService, JwtStrategy, RefreshTokenStrategy],
   controllers: [AuthController],
