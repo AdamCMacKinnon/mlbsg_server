@@ -51,7 +51,7 @@ export class LeagueService {
             );
             break;
           case 'S':
-            Logger.warn(`Game ${gamePk} has not started yet`);
+            Logger.log(`Game ${gamePk} has not started yet`);
             break;
           case 'DR':
             Logger.warn(
