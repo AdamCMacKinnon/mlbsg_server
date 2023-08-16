@@ -1,18 +1,34 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
+import { Role } from './enums/roles.enum';
+import { Roles } from './decorators/roles.decorator';
+import { RolesGuard } from './roles.guard';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Get('/users/:id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.player, Role.admin)
   getUserById(@Param('id') id: string): Promise<User> {
     return this.authService.getUserById(id);
   }
   @Get('refreshtoken/:id')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.player, Role.admin)
   refreshToken(
     @Param('id') id: string,
     refreshToken: string,
@@ -30,6 +46,8 @@ export class AuthController {
     return this.authService.login(authCredentialsDto);
   }
   @Patch('/update')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(Role.player, Role.admin)
   updateAccount(@Body() userUpdateDto: UserUpdateDto): Promise<User> {
     return this.authService.updateAccount(userUpdateDto);
   }
