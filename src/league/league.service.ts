@@ -35,6 +35,9 @@ export class LeagueService {
           case 'I':
             Logger.log(`Game ${gamePk} is in progress!`);
             break;
+          case 'O':
+            Logger.log(`Game ${gamePk} is OVER!`);
+            break;
           case 'F':
             Logger.log(`Game ${gamePk} is FINAL!`);
             await this.leagueRepository.dailyResults(
