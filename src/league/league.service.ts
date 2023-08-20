@@ -6,6 +6,17 @@ import axios from 'axios';
 import { BatchRepository } from '../batch/batch.repository';
 import { season } from '../utils/globals';
 
+/**
+ * Daily Update Status Codes:
+ * S = SCHEDULED (Game is on the schedule, not yet started)
+ * P = PRE GAME (Game has not begun yet)
+ * PW = PRE GAME WARMUP (Game is about to begin, teams are on the field warming up)
+ * I = IN PROGRESS (The game has begun)
+ * O = OVER (The game has completed but not made final just yet)
+ * F = FINAL (Game is over and results have been finalized.  Records to Database)
+ * DR = POSTPONED (Game has been postponed due to weather or other factors)
+ */
+
 @Injectable()
 export class LeagueService {
   constructor(
