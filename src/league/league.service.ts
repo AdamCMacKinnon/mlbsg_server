@@ -15,6 +15,7 @@ import { season } from '../utils/globals';
  * O = OVER (The game has completed but not made final just yet)
  * F = FINAL (Game is over and results have been finalized.  Records to Database)
  * DR/DI/DG = POSTPONED (Game has been postponed due to weather or other factors)
+ * PR = DELAYED START (Game is expected to start, but not on time)
  */
 
 @Injectable()
