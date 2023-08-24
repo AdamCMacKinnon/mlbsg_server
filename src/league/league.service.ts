@@ -14,7 +14,8 @@ import { season } from '../utils/globals';
  * I = IN PROGRESS (The game has begun)
  * O = OVER (The game has completed but not made final just yet)
  * F = FINAL (Game is over and results have been finalized.  Records to Database)
- * DR = POSTPONED (Game has been postponed due to weather or other factors)
+ * DR/DI/DG = POSTPONED (Game has been postponed due to weather or other factors)
+ * PR = DELAYED START (Game is expected to start, but not on time)
  */
 
 @Injectable()
@@ -65,9 +66,12 @@ export class LeagueService {
             );
             break;
           case 'S':
+          case 'PR':
             Logger.log(`Game ${gamePk} has not started yet`);
             break;
+          case 'DG':
           case 'DR':
+          case 'DI':
             Logger.warn(
               `Game ${gamePk} between ${homeTeam} and ${awayTeam} has been postponed`,
             );
@@ -89,7 +93,7 @@ export class LeagueService {
             Logger.log(`Game ${gamePk} is in Pre-Game Status`);
             break;
           default:
-            Logger.warn(`Game ${gamePk} Unknown Status Code!`);
+            Logger.warn(`Game ${gamePk} Unknown Status Code! ${errorCode}`);
             await this.leagueRepository.query(
               `
               INSERT INTO game_data_rejects
