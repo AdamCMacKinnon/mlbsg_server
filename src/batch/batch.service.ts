@@ -89,42 +89,42 @@ export class BatchService {
    */
 
   // runs Sunday at 9AM, one time.
-  @Cron('0 0 09 * * 6', {
-    name: 'blank_active_users',
-    timeZone: 'America/New_York',
-  })
-  async alertBlankUsers() {
-    const jobType = JobType.email_blank;
-    const date = format(new Date(), 'yyyy-LL-dd');
-    const week = (await this.batchRepository.getWeekQuery(date)) - 1;
-    const emailUsers = await this.emailService.emailBlankUsers(week);
-    const emailBlanks = this.schedulerRegistry.getCronJob('blank_active_users');
-    emailBlanks.start();
-    const jobStatus =
-      emailUsers.length > 0 ? JobStatus.success : JobStatus.failure;
-    await this.batchRepository.batchJobData(jobType, jobStatus);
-    if (jobStatus === JobStatus.failure) {
-      await this.emailService.batchAlert(jobType);
-    }
-  }
+  // @Cron('0 0 09 * * 6', {
+  //   name: 'blank_active_users',
+  //   timeZone: 'America/New_York',
+  // })
+  // async alertBlankUsers() {
+  //   const jobType = JobType.email_blank;
+  //   const date = format(new Date(), 'yyyy-LL-dd');
+  //   const week = (await this.batchRepository.getWeekQuery(date)) - 1;
+  //   const emailUsers = await this.emailService.emailBlankUsers(week);
+  //   const emailBlanks = this.schedulerRegistry.getCronJob('blank_active_users');
+  //   emailBlanks.start();
+  //   const jobStatus =
+  //     emailUsers.length > 0 ? JobStatus.success : JobStatus.failure;
+  //   await this.batchRepository.batchJobData(jobType, jobStatus);
+  //   if (jobStatus === JobStatus.failure) {
+  //     await this.emailService.batchAlert(jobType);
+  //   }
+  // }
 
   // runs Monday at 9AM, one time.
-  @Cron('0 0 09 * * 1', {
-    name: 'user_status',
-    timeZone: 'America/New_York',
-  })
-  async sendUserStatus() {
-    const jobType = JobType.email_status;
-    const date = format(new Date(), 'yyyy-LL-dd');
-    const week = await this.batchRepository.getWeekQuery(date);
-    const userStatus = await this.emailService.emailUserStatus(week);
-    const emailStatus = this.schedulerRegistry.getCronJob('user_status');
-    emailStatus.start();
-    const jobStatus =
-      userStatus.length > 0 ? JobStatus.success : JobStatus.failure;
-    await this.batchRepository.batchJobData(jobType, jobStatus);
-    if (jobStatus === JobStatus.failure) {
-      await this.emailService.batchAlert(jobType);
-    }
-  }
+  // @Cron('0 0 09 * * 1', {
+  //   name: 'user_status',
+  //   timeZone: 'America/New_York',
+  // })
+  // async sendUserStatus() {
+  //   const jobType = JobType.email_status;
+  //   const date = format(new Date(), 'yyyy-LL-dd');
+  //   const week = await this.batchRepository.getWeekQuery(date);
+  //   const userStatus = await this.emailService.emailUserStatus(week);
+  //   const emailStatus = this.schedulerRegistry.getCronJob('user_status');
+  //   emailStatus.start();
+  //   const jobStatus =
+  //     userStatus.length > 0 ? JobStatus.success : JobStatus.failure;
+  //   await this.batchRepository.batchJobData(jobType, jobStatus);
+  //   if (jobStatus === JobStatus.failure) {
+  //     await this.emailService.batchAlert(jobType);
+  //   }
+  // }
 }
