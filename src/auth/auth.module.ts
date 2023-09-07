@@ -10,6 +10,7 @@ import { RefreshTokenStrategy } from './jwt-refresh.strategy';
 import { EmailService } from '../email/email.service';
 import { EmailRepository } from '../email/email.repository';
 import { EmailRejectsRepository } from '../email/emailRejects.repository';
+import { BatchRepository } from '../batch/batch.repository';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { EmailRejectsRepository } from '../email/emailRejects.repository';
       UsersRepository,
       EmailRepository,
       EmailRejectsRepository,
+      BatchRepository,
     ]),
   ],
   providers: [AuthService, JwtStrategy, RefreshTokenStrategy, EmailService],
