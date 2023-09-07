@@ -15,12 +15,15 @@ import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
 import { season } from '../utils/globals';
 import { EmailService } from '../email/email.service';
+import { BatchRepository } from '../batch/batch.repository';
 @Injectable()
 export class AuthService {
   private Logger = new Logger('UserService');
   constructor(
     @InjectRepository(UsersRepository)
     private usersRepository: UsersRepository,
+    @InjectRepository(BatchRepository)
+    private batchRepository: BatchRepository,
     private jwtService: JwtService,
     private emailService: EmailService,
   ) {}

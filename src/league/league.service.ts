@@ -6,6 +6,18 @@ import axios from 'axios';
 import { BatchRepository } from '../batch/batch.repository';
 import { season } from '../utils/globals';
 
+/**
+ * Daily Update Status Codes:
+ * S = SCHEDULED (Game is on the schedule, not yet started)
+ * P = PRE GAME (Game has not begun yet)
+ * PW = PRE GAME WARMUP (Game is about to begin, teams are on the field warming up)
+ * I = IN PROGRESS (The game has begun)
+ * O = OVER (The game has completed but not made final just yet)
+ * F = FINAL (Game is over and results have been finalized.  Records to Database)
+ * DR/DI/DG = POSTPONED (Game has been postponed due to weather or other factors)
+ * PR = DELAYED START (Game is expected to start, but not on time)
+ */
+
 @Injectable()
 export class LeagueService {
   constructor(
@@ -20,48 +32,79 @@ export class LeagueService {
     console.log(url);
     try {
       const response = await axios.get(url);
+      const totalGames = response.data.totalItems;
       const data = response.data.dates[0].games;
-      for (let x = 0; x < data.length; x++) {
-        if (data[x].teams.home.score && data[x].teams.away.score) {
-          const gamePk = data[x].gamePk;
-          const homeTeam = data[x].teams.home.team.name;
-          const homeScore = data[x].teams.home.score;
-          const homeDiff = data[x].teams.home.score - data[x].teams.away.score;
-          const awayTeam = data[x].teams.away.team.name;
-          const awayScore = data[x].teams.away.score;
-          const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
-
-          await this.leagueRepository.dailyResults(
-            date,
-            week,
-            gamePk,
-            homeTeam,
-            homeScore,
-            homeDiff,
-            awayTeam,
-            awayScore,
-            awayDiff,
-            season,
-          );
-        } else if (data[x].status.statusCode === 'DR') {
-          Logger.warn(`Game ${data[x].gamePk} Has been Postponed`);
-          const gamePPD = 'Postponed Game';
-          const gamePk = data[x].gamePk;
-          const homeTeam = data[x].teams.home.team.name;
-          const awayTeam = data[x].teams.away.team.name;
-          await this.leagueRepository.query(
-            `
-            INSERT INTO game_data_rejects
-            (game_pk, game_date, week, season, home_team, away_team, error_message)
-            VALUES
-            ($1, $2, $3, $4, $5, $6, $7)
-            ON CONFLICT DO NOTHING
-            `,
-            [gamePk, date, week, season, homeTeam, awayTeam, gamePPD],
-          );
-        } else {
-          Logger.warn(`Game ${data[x].gamePk} Has not started yet`);
-          x++;
+      for (let x = 0; x < totalGames; x++) {
+        const gamePk = data[x].gamePk;
+        const homeTeam = data[x].teams.home.team.name;
+        const homeScore = data[x].teams.home.score;
+        const homeDiff = data[x].teams.home.score - data[x].teams.away.score;
+        const awayTeam = data[x].teams.away.team.name;
+        const awayScore = data[x].teams.away.score;
+        const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
+        const errorCode = data[x].status.statusCode;
+        switch (data[x].status.statusCode) {
+          case 'I':
+            Logger.log(`Game ${gamePk} is in progress!`);
+            break;
+          case 'O':
+            Logger.log(`Game ${gamePk} is OVER!`);
+            break;
+          case 'F':
+            Logger.log(`Game ${gamePk} is FINAL!`);
+            await this.leagueRepository.dailyResults(
+              date,
+              week,
+              gamePk,
+              homeTeam,
+              homeScore,
+              homeDiff,
+              awayTeam,
+              awayScore,
+              awayDiff,
+              season,
+            );
+            break;
+          case 'S':
+          case 'PR':
+            Logger.log(`Game ${gamePk} has not started yet`);
+            break;
+          case 'DG':
+          case 'DR':
+          case 'DI':
+            Logger.warn(
+              `Game ${gamePk} between ${homeTeam} and ${awayTeam} has been postponed`,
+            );
+            await this.leagueRepository.query(
+              `
+              INSERT INTO game_data_rejects
+              (game_pk, game_date, week, season, home_team, away_team, error_message)
+              VALUES
+              ($1, $2, $3, $4, $5, $6, $7)
+              ON CONFLICT DO NOTHING
+              `,
+              [gamePk, date, week, season, homeTeam, awayTeam, errorCode],
+            );
+            break;
+          case 'PW':
+            Logger.log(`Game ${gamePk} is in Warmup right now.`);
+            break;
+          case 'P':
+            Logger.log(`Game ${gamePk} is in Pre-Game Status`);
+            break;
+          default:
+            Logger.warn(`Game ${gamePk} Unknown Status Code! ${errorCode}`);
+            await this.leagueRepository.query(
+              `
+              INSERT INTO game_data_rejects
+              (game_pk, game_date, week, season, home_team, away_team, error_message)
+              VALUES
+              ($1, $2, $3, $4, $5, $6, $7)
+              ON CONFLICT DO NOTHING
+              `,
+              [gamePk, date, week, season, homeTeam, awayTeam, errorCode],
+            );
+            break;
         }
       }
       return data;
@@ -73,8 +116,6 @@ export class LeagueService {
 
   async updateUserDiffs(week: number): Promise<string[]> {
     try {
-      // testing in local, i'm not sure this "WHERE/AND" clause... does anything?  Working as-is for now
-      // TODO: test in cloud env's to ensure proper data is being pulled when adding the SEASON param.
       const query = await this.leagueRepository.query(
         `
         WITH teams AS (

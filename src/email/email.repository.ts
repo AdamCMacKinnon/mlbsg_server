@@ -51,8 +51,8 @@ export class EmailRepository extends Repository<Email> {
         SELECT id, email, username, isactive, picks.week, picks.pick, picks.run_diff
         FROM public.user
         JOIN picks ON public.user.id=picks."userId"
-        WHERE picks.week = $1;
-        AND picks.season = $2
+        WHERE picks.week = $1
+        AND picks.season = $2;
         `,
         [week, season],
       );
