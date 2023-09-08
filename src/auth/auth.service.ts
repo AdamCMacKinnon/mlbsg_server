@@ -14,8 +14,8 @@ import { JwtPayload } from './jwt-payload.interface';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
 import { season } from '../utils/globals';
+import { EmailService } from '../email/email.service';
 import { BatchRepository } from '../batch/batch.repository';
-import { format } from 'date-fns';
 @Injectable()
 export class AuthService {
   private Logger = new Logger('UserService');
@@ -25,19 +25,15 @@ export class AuthService {
     @InjectRepository(BatchRepository)
     private batchRepository: BatchRepository,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async register(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    const date = format(new Date(), 'yyyy-LL-dd');
-    const week = await this.batchRepository.getWeekQuery(date);
-    console.log(week);
-    if (week >= 1) {
-      throw new NotFoundException(
-        'Cannot Register new user as registration period has closed.',
-      );
-    } else {
-      return this.usersRepository.createUser(authCredentialsDto);
-    }
+    await this.usersRepository.createUser(authCredentialsDto);
+    await this.emailService.welcomeEmail(
+      authCredentialsDto.email,
+      authCredentialsDto.username,
+    );
   }
 
   async login(

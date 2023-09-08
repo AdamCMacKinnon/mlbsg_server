@@ -82,3 +82,22 @@ export function supportTicketText(createTicketDto: CreateTicketDto) {
     `;
   return content;
 }
+
+export function welcomeEmailHtml(username: string) {
+  const content = `
+  <b>HELLO ${username}!</b>\n
+  Welcome to the MLB Survivor Game!  If you haven't yet, check out the Game Rules ! \n
+  \t If you have any issues, or you believe you received this email in error, <a href="https://www.mlbsurvivorgame.com">please send us a notice (click <i>"report issue"</i>)</a> \n 
+  do not reply directly to this email, please.
+  `;
+  return content;
+}
+export function welcomeEmailText(username: string) {
+  const content = `
+  HELLO ${username}\n
+  \t Welcome to the MLB Survivor Game!  If you haven't yet, check out the Game Rules! \n
+  \t If you have any issues, or you believe you received this email in error, please send us a notice by navigating to the home page (mlbsurvivorgame.com) and click on "report issue"\n
+  (do not reply directly to this email, please).
+  `;
+  return content;
+}
