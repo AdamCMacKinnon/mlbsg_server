@@ -6,6 +6,8 @@ import { EmailRejectsRepository } from './emailRejects.repository';
 import {
   emptyWeekHtml,
   emptyWeekText,
+  passwordResetHtml,
+  passwordResetText,
   supportTicketHtml,
   supportTicketText,
   userStatusHtml,
@@ -164,6 +166,20 @@ export class EmailService {
     const emailBodyHtml = welcomeEmailHtml(username);
     const emailBodyText = welcomeEmailText(username);
     const emailSubject = 'Welcome to MLBSG!';
+    await this.sendEmail(
+      userEmail,
+      username,
+      emailBodyHtml,
+      emailBodyText,
+      emailSubject,
+      emailType,
+    );
+  }
+  async passwordResetEmail(userEmail: string, username: string, temp: string) {
+    const emailType = EmailType.password;
+    const emailBodyHtml = passwordResetHtml(username, temp);
+    const emailBodyText = passwordResetText(username, temp);
+    const emailSubject = 'MLBSG Password Reset';
     await this.sendEmail(
       userEmail,
       username,

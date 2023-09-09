@@ -16,6 +16,7 @@ import { User } from './user.entity';
 import { season } from '../utils/globals';
 import { EmailService } from '../email/email.service';
 import { BatchRepository } from '../batch/batch.repository';
+import { randomBytes } from 'crypto';
 @Injectable()
 export class AuthService {
   private Logger = new Logger('UserService');
@@ -65,7 +66,7 @@ export class AuthService {
   }
 
   async updateAccount(userUpdateDto: UserUpdateDto): Promise<User> {
-    const { username, email, password } = userUpdateDto;
+    const { username, email } = userUpdateDto;
     try {
       const userToUpdate = await this.usersRepository.findOne({
         where: [{ email }, { username }],
@@ -73,11 +74,6 @@ export class AuthService {
       userToUpdate.username = username;
       userToUpdate.email = email;
 
-      if (password) {
-        const salt = await bcrypt.genSalt();
-        const updatePassHash = await bcrypt.hash(password, salt);
-        userToUpdate.password = updatePassHash;
-      }
       await this.usersRepository.save(userToUpdate);
       Logger.log(`User information successfully updated!`);
       return userToUpdate;
@@ -120,6 +116,33 @@ export class AuthService {
     } else {
       const refresh = await this.jwtService.verify(refreshToken);
       return refresh;
+    }
+  }
+
+  async passwordReset(userUpdateDto: UserUpdateDto): Promise<string> {
+    const { username, email } = userUpdateDto;
+    try {
+      const user = await this.usersRepository.findOne({
+        where: [{ email }, { username }],
+      });
+      if (!user) {
+        throw new NotFoundException('The username or email entered is invalid');
+      } else {
+        console.log(user.password);
+        const temp = randomBytes(8).toString('hex').toUpperCase();
+        console.log('CRYPTO STRING    ' + temp);
+        const salt = await bcrypt.genSalt();
+        const updatePassHash = await bcrypt.hash(temp, salt);
+        user.password = updatePassHash;
+        console.log('AFTER HASH   ' + user.password);
+        const userEmail = email;
+        await this.usersRepository.save(user);
+        await this.emailService.passwordResetEmail(userEmail, username, temp);
+      }
+      return `Password Reset Success!  Email sent to ${email}`;
+    } catch (error) {
+      Logger.error('ERROR RESETTING PASSWORD! ---- ' + error);
+      return error;
     }
   }
 }

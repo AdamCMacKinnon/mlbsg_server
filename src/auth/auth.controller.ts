@@ -51,4 +51,8 @@ export class AuthController {
   updateAccount(@Body() userUpdateDto: UserUpdateDto): Promise<User> {
     return this.authService.updateAccount(userUpdateDto);
   }
+  @Patch('/passwordreset')
+  passwordReset(@Body() userUpdateDto: UserUpdateDto): Promise<string> {
+    return this.authService.passwordReset(userUpdateDto);
+  }
 }
