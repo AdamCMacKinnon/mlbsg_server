@@ -101,3 +101,19 @@ export function welcomeEmailText(username: string) {
   `;
   return content;
 }
+
+export function passwordResetHtml(username: string, temp: string) {
+  const content = `
+  <h3>HELLO ${username}</h3><br></br>
+  Your temporary Password is: <b>${temp}</b>
+  `;
+  return content;
+}
+
+export function passwordResetText(username: string, temp: string) {
+  const content = `
+  HELLO ${username}\n
+  Your temporary password is: \t ${temp}
+  `;
+  return content;
+}

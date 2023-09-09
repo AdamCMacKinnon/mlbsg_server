@@ -135,7 +135,9 @@ export class AuthService {
         const updatePassHash = await bcrypt.hash(temp, salt);
         user.password = updatePassHash;
         console.log('AFTER HASH   ' + user.password);
+        const userEmail = email;
         await this.usersRepository.save(user);
+        await this.emailService.passwordResetEmail(userEmail, username, temp);
       }
       return `Password Reset Success!  Email sent to ${email}`;
     } catch (error) {
