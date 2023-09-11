@@ -123,26 +123,28 @@ export class AuthService {
     const { username, email } = userUpdateDto;
     try {
       const user = await this.usersRepository.findOne({
-        where: [{ email }, { username }],
+        where: { email },
       });
+      console.log(user);
       if (!user) {
         throw new NotFoundException('The username or email entered is invalid');
       } else {
-        console.log(user.password);
-        const temp = randomBytes(8).toString('hex').toUpperCase();
-        console.log('CRYPTO STRING    ' + temp);
+        const temp = randomBytes(6).toString('hex').toUpperCase() + '!a';
+        Logger.log('Temporary Password Generated!');
         const salt = await bcrypt.genSalt();
         const updatePassHash = await bcrypt.hash(temp, salt);
         user.password = updatePassHash;
-        console.log('AFTER HASH   ' + user.password);
         const userEmail = email;
+        Logger.log(`Password Reset Email sent to ${email}`);
         await this.usersRepository.save(user);
         await this.emailService.passwordResetEmail(userEmail, username, temp);
       }
       return `Password Reset Success!  Email sent to ${email}`;
     } catch (error) {
-      Logger.error('ERROR RESETTING PASSWORD! ---- ' + error);
-      return error;
+      Logger.error('ERROR RESETTING PASSWORD! ---- ' + error.stack);
+      throw new NotFoundException(
+        'There was an internal error resetting password',
+      );
     }
   }
 }
