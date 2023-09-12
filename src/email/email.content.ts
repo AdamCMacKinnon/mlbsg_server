@@ -105,7 +105,8 @@ export function welcomeEmailText(username: string) {
 export function passwordResetHtml(username: string, temp: string) {
   const content = `
   <h3>HELLO ${username}</h3><br></br>
-  Your temporary Password is: <b>${temp}</b>
+  Your temporary Password is: <b>${temp}</b><br></br>
+  You can <a href="https://www.mlbsurvivorgame.com/login" target="_blank">Login Here with your new password</a>
   `;
   return content;
 }
