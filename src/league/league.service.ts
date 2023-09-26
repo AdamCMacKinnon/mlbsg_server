@@ -14,7 +14,7 @@ import { season } from '../utils/globals';
  * I = IN PROGRESS (The game has begun)
  * O = OVER (The game has completed but not made final just yet)
  * F = FINAL (Game is over and results have been finalized.  Records to Database)
- * DR/DI/DG = POSTPONED (Game has been postponed due to weather or other factors)
+ * DR/DI/DG/DO = POSTPONED (Game has been postponed due to weather or other factors)
  * PR = DELAYED START (Game is expected to start, but not on time)
  */
 
@@ -46,6 +46,18 @@ export class LeagueService {
         switch (data[x].status.statusCode) {
           case 'I':
             Logger.log(`Game ${gamePk} is in progress!`);
+            await this.leagueRepository.dailyResults(
+              date,
+              week,
+              gamePk,
+              homeTeam,
+              homeScore,
+              homeDiff,
+              awayTeam,
+              awayScore,
+              awayDiff,
+              season,
+            );
             break;
           case 'O':
             Logger.log(`Game ${gamePk} is OVER!`);
@@ -71,6 +83,7 @@ export class LeagueService {
             break;
           case 'DG':
           case 'DR':
+          case 'DO':
           case 'DI':
             Logger.warn(
               `Game ${gamePk} between ${homeTeam} and ${awayTeam} has been postponed`,
