@@ -14,6 +14,7 @@ export class LeagueRepository extends Repository<League> {
     awayTeam: string,
     awayScore: number,
     awayDiff: number,
+    gameCode: string,
     season: string,
   ): Promise<void> {
     try {
@@ -22,11 +23,12 @@ export class LeagueRepository extends Repository<League> {
         week: week,
         game_pk: gamePk,
         home_team: homeTeam,
-        home_score: homeScore,
-        home_diff: homeDiff,
+        home_score: homeScore || 0,
+        home_diff: homeDiff || 0,
         away_team: awayTeam,
-        away_score: awayScore,
-        away_diff: awayDiff,
+        away_score: awayScore || 0,
+        away_diff: awayDiff || 0,
+        game_code: gameCode,
         season: season,
       });
       await this.save(game);
@@ -37,6 +39,7 @@ export class LeagueRepository extends Repository<League> {
         (game_pk, game_date, week, home_team, away_team, error_message)
         VALUES
         ($1, $2, $3, $4, $5, $6)
+        ON CONFLICT (game_pk) DO UPDATE
         `,
         [gamePk, date, week, homeTeam, awayTeam, error.message],
       );

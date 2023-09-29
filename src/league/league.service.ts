@@ -42,87 +42,25 @@ export class LeagueService {
         const awayTeam = data[x].teams.away.team.name;
         const awayScore = data[x].teams.away.score;
         const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
-        const errorCode = data[x].status.statusCode;
-        switch (data[x].status.statusCode) {
-          case 'I':
-            Logger.log(`Game ${gamePk} is in progress!`);
-            await this.leagueRepository.dailyResults(
-              date,
-              week,
-              gamePk,
-              homeTeam,
-              homeScore,
-              homeDiff,
-              awayTeam,
-              awayScore,
-              awayDiff,
-              season,
-            );
-            break;
-          case 'O':
-            Logger.log(`Game ${gamePk} is OVER!`);
-            break;
-          case 'F':
-            Logger.log(`Game ${gamePk} is FINAL!`);
-            await this.leagueRepository.dailyResults(
-              date,
-              week,
-              gamePk,
-              homeTeam,
-              homeScore,
-              homeDiff,
-              awayTeam,
-              awayScore,
-              awayDiff,
-              season,
-            );
-            break;
-          case 'S':
-          case 'PR':
-            Logger.log(`Game ${gamePk} has not started yet`);
-            break;
-          case 'DG':
-          case 'DR':
-          case 'DO':
-          case 'DI':
-            Logger.warn(
-              `Game ${gamePk} between ${homeTeam} and ${awayTeam} has been postponed`,
-            );
-            await this.leagueRepository.query(
-              `
-              INSERT INTO game_data_rejects
-              (game_pk, game_date, week, season, home_team, away_team, error_message)
-              VALUES
-              ($1, $2, $3, $4, $5, $6, $7)
-              ON CONFLICT DO NOTHING
-              `,
-              [gamePk, date, week, season, homeTeam, awayTeam, errorCode],
-            );
-            break;
-          case 'PW':
-            Logger.log(`Game ${gamePk} is in Warmup right now.`);
-            break;
-          case 'P':
-            Logger.log(`Game ${gamePk} is in Pre-Game Status`);
-            break;
-          default:
-            Logger.warn(`Game ${gamePk} Unknown Status Code! ${errorCode}`);
-            await this.leagueRepository.query(
-              `
-              INSERT INTO game_data_rejects
-              (game_pk, game_date, week, season, home_team, away_team, error_message)
-              VALUES
-              ($1, $2, $3, $4, $5, $6, $7)
-              ON CONFLICT DO NOTHING
-              `,
-              [gamePk, date, week, season, homeTeam, awayTeam, errorCode],
-            );
-            break;
-        }
+        const gameCode = data[x].status.statusCode;
+        Logger.log(`Game ${gamePk} is in Status: ${gameCode}`);
+        await this.leagueRepository.dailyResults(
+          date,
+          week,
+          gamePk,
+          homeTeam,
+          homeScore,
+          homeDiff,
+          awayTeam,
+          awayScore,
+          awayDiff,
+          gameCode,
+          season,
+        );
       }
       return data;
     } catch (error) {
-      Logger.warn(`THERE WAS AN ERROR! ${error}`);
+      Logger.error(`THERE WAS AN ERROR! ${error}`);
       return error;
     }
   }

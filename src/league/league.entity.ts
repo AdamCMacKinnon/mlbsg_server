@@ -30,5 +30,8 @@ export class League {
   away_diff: number;
 
   @Column({ nullable: true })
+  game_code: string;
+
+  @Column({ nullable: true })
   season: string;
 }
