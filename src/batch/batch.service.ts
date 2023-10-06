@@ -23,9 +23,9 @@ export class BatchService {
    * user_update = updates run differential on user table
    * ** For local testing, use CronExpression Enum for every 30 seconds.
    */
-  // runs every 10 minutes every day
-  // @Cron('0 */5 * * MAR-NOV *', {
-  @Cron(CronExpression.EVERY_MINUTE, {
+  // runs every 5 minutes every day between March and November
+  @Cron('0 */5 * * MAR-NOV *', {
+  // @Cron(CronExpression.EVERY_MINUTE, {
     name: 'daily_score_updates',
     timeZone: 'America/New_York',
   })
@@ -46,26 +46,26 @@ export class BatchService {
   }
 
   // runs at 7AM to get the previous days results if the game passes the daily updates.
-  @Cron('0 7 * * *', {
-    name: 'previous_day_cleanup',
-    timeZone: 'America/New_York',
-  })
-  async prevDay() {
-    Logger.log('Daily Score cleanup job');
-    const jobType = JobType.daily_api_cleanup;
-    const date = format(subDays(new Date(), 1), 'yyyy-LL-dd');
-    Logger.log(`Getting Game Data for ${date}`);
-    const week = await this.batchRepository.getWeekQuery(date);
-    const updateCall = await this.leagueService.dailyLeagueUpdate(date, week);
-    const cleanup = this.schedulerRegistry.getCronJob('previous_day_cleanup');
-    cleanup.start();
-    const jobStatus =
-      updateCall.length > 0 ? JobStatus.success : JobStatus.failure;
-    await this.batchRepository.batchJobData(jobType, jobStatus);
-    if (jobStatus === JobStatus.failure) {
-      await this.emailService.batchAlert(jobType);
-    }
-  }
+  // @Cron('0 7 * * MAR-NOV *', {
+  //   name: 'previous_day_cleanup',
+  //   timeZone: 'America/New_York',
+  // })
+  // async prevDay() {
+  //   Logger.log('Daily Score cleanup job');
+  //   const jobType = JobType.daily_api_cleanup;
+  //   const date = format(subDays(new Date(), 1), 'yyyy-LL-dd');
+  //   Logger.log(`Getting Game Data for ${date}`);
+  //   const week = await this.batchRepository.getWeekQuery(date);
+  //   const updateCall = await this.leagueService.dailyLeagueUpdate(date, week);
+  //   const cleanup = this.schedulerRegistry.getCronJob('previous_day_cleanup');
+  //   cleanup.start();
+  //   const jobStatus =
+  //     updateCall.length > 0 ? JobStatus.success : JobStatus.failure;
+  //   await this.batchRepository.batchJobData(jobType, jobStatus);
+  //   if (jobStatus === JobStatus.failure) {
+  //     await this.emailService.batchAlert(jobType);
+  //   }
+  // }
 
   // runs every Monday at 7am that updates the diff column on the user table.
   @Cron('0 0 07 * * 1', { name: 'user_update', timeZone: 'America/New_York' })
