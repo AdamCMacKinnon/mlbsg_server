@@ -24,8 +24,8 @@ export class BatchService {
    * ** For local testing, use CronExpression Enum for every 30 seconds.
    */
   // runs every 10 minutes every day
-  @Cron('0 */5 * * MAR-NOV *', {
-    // @Cron(CronExpression.EVERY_MINUTE, {
+  // @Cron('0 */5 * * MAR-NOV *', {
+  @Cron(CronExpression.EVERY_MINUTE, {
     name: 'daily_score_updates',
     timeZone: 'America/New_York',
   })
