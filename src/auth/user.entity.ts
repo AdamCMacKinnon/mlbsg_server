@@ -1,4 +1,5 @@
 import { Picks } from '../picks/picks.entity';
+import { SubLeagues } from '../subs/subs.entity';
 import {
   Column,
   CreateDateColumn,
@@ -47,6 +48,9 @@ export class User {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Picks, (pick) => pick.user, { eager: true })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @OneToMany((_type) => SubLeagues, (sub) => sub.user, { eager: true })
   picks: Picks[];
-  user: Picks;
+  subleagues: SubLeagues[];
+  user: [Picks, SubLeagues];
 }
