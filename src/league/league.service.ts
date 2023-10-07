@@ -33,34 +33,46 @@ export class LeagueService {
     try {
       const response = await axios.get(url);
       const totalGames = response.data.totalItems;
-      const data = response.data.dates[0].games;
-      for (let x = 0; x < totalGames; x++) {
-        const gamePk = data[x].gamePk;
-        const homeTeam = data[x].teams.home.team.name;
-        const homeScore = data[x].teams.home.score;
-        const homeDiff = data[x].teams.home.score - data[x].teams.away.score;
-        const awayTeam = data[x].teams.away.team.name;
-        const awayScore = data[x].teams.away.score;
-        const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
-        const gameCode = data[x].status.statusCode;
-        Logger.log(`Game ${gamePk} is in Status: ${gameCode}`);
-        await this.leagueRepository.dailyResults(
-          date,
-          week,
-          gamePk,
-          homeTeam,
-          homeScore,
-          homeDiff,
-          awayTeam,
-          awayScore,
-          awayDiff,
-          gameCode,
-          season,
-        );
+      if (!totalGames) {
+        const message = 'There are no Games scheduled today!!';
+        Logger.warn(message);
+        return message;
+      } else {
+        const data = response.data.dates[0].games;
+        for (let x = 0; x < totalGames; x++) {
+          const gamePk = data[x].gamePk;
+          const homeTeam = data[x].teams.home.team.name;
+          const homeScore = data[x].teams.home.score;
+          const homeDiff = data[x].teams.home.score - data[x].teams.away.score;
+          const awayTeam = data[x].teams.away.team.name;
+          const awayScore = data[x].teams.away.score;
+          const awayDiff = data[x].teams.away.score - data[x].teams.home.score;
+          const gameCode = data[x].status.statusCode;
+          Logger.log(`Game ${gamePk} is in Status: ${gameCode}`);
+          await this.leagueRepository.dailyResults(
+            date,
+            week,
+            gamePk,
+            homeTeam,
+            homeScore,
+            homeDiff,
+            awayTeam,
+            awayScore,
+            awayDiff,
+            gameCode,
+            season,
+          );
+        }
+        return data;
       }
-      return data;
     } catch (error) {
-      Logger.error(`THERE WAS AN ERROR! ${error}`);
+      console.log(error);
+      if (error.includes('TypeError: Cannot read properties of undefined')) {
+        Logger.warn('NO GAMES SCHEDULED TODAY!');
+      } else {
+        Logger.error(`THERE WAS AN ERROR! ${error}`);
+      }
+
       return error;
     }
   }
