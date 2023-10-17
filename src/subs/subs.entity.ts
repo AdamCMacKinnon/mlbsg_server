@@ -1,12 +1,17 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { GameType } from './enum/game-mode.enum';
 import { Exclude } from 'class-transformer';
 import { User } from '../auth/user.entity';
+import { Role } from '../auth/enums/roles.enum';
 
 @Entity('sub_leagues')
 export class SubLeagues {
-  @PrimaryColumn()
-  user_id: string;
+  @Exclude()
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  passcode: string;
 
   @Column({ nullable: false })
   league_id: string;
@@ -14,8 +19,11 @@ export class SubLeagues {
   @Column()
   league_name: string;
 
-  @Column()
+  @Column({ default: true })
   active: boolean;
+
+  @Column({ default: Role.player })
+  league_role: Role;
 
   @Column()
   game_mode: GameType;

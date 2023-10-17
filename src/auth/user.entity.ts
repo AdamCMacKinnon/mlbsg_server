@@ -29,6 +29,7 @@ export class User {
   @Column({ default: true })
   isactive: boolean;
 
+  // This needs to be moved to the subleague table.
   @Column({ default: Role.player })
   role: Role;
 
@@ -48,9 +49,9 @@ export class User {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => Picks, (pick) => pick.user, { eager: true })
+  picks: Picks[];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => SubLeagues, (sub) => sub.user, { eager: true })
-  picks: Picks[];
   subleagues: SubLeagues[];
   user: [Picks, SubLeagues];
 }
