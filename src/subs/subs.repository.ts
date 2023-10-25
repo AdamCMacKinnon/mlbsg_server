@@ -2,7 +2,6 @@ import { EntityRepository, Repository } from 'typeorm';
 import { SubLeagues } from './subs.entity';
 import { Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { Role } from '../auth/enums/roles.enum';
 import { User } from '../auth/user.entity';
 import { GameType } from './enum/game-mode.enum';
 
@@ -20,7 +19,6 @@ export class SubsRepository extends Repository<SubLeagues> {
         passcode,
         league_id: leagueId,
         league_name: leagueName,
-        league_role: Role.commish,
         game_mode: gameMode,
         user,
       });
@@ -31,4 +29,5 @@ export class SubsRepository extends Repository<SubLeagues> {
       return error;
     }
   }
+  // async joinLeague(league_id: string);
 }
