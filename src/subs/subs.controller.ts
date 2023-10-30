@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { SubsService } from './subs.service';
 import { CreateLeagueDto } from './dto/create-league.dto';
@@ -26,5 +26,13 @@ export class SubsController {
     @GetSubLeagues() subLeagues: SubLeagues,
   ): Promise<string> {
     return this.subsService.joinLeague(passcode, user, subLeagues);
+  }
+  @Get('/leagues/:id')
+  getLeagueBySubId(@Param('id') id: string): Promise<SubLeagues> {
+    return this.subsService.getLeagueBySubId(id);
+  }
+  @Get('/leagues/users/:id')
+  getLeaguesByUserId(@Param('id') id: string): Promise<SubLeagues> {
+    return this.subsService.getLeagueByUserId(id);
   }
 }
