@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Role } from './enums/roles.enum';
+import { SubsUsers } from '../subs/subsUsers/subsUsers.entity';
 
 @Entity()
 export class User {
@@ -53,5 +54,8 @@ export class User {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => SubLeagues, (sub) => sub.user, { eager: true })
   subleagues: SubLeagues[];
-  user: [Picks, SubLeagues];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @OneToMany((_type) => SubsUsers, (subUser) => subUser.user, { eager: true })
+  subsUsers: SubsUsers[];
+  user: [Picks, SubLeagues, SubsUsers];
 }

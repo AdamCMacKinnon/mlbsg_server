@@ -2,8 +2,8 @@ import { Exclude } from 'class-transformer';
 import {
   Column,
   Entity,
+  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../auth/user.entity';
@@ -21,11 +21,20 @@ export class SubsUsers {
   @Column({ default: Role.player })
   league_role: Role;
 
-  @Exclude({ toPlainOnly: true })
+  @Column()
+  league_name: string;
+
+  @Column({ default: 0 })
+  run_diff: number;
+
+  @Column()
+  league_id: string;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, (user) => user.subleagues, { eager: false })
   user: User;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne((_type) => SubLeagues, (sub) => sub.league_id, { eager: true })
+  @ManyToMany((_type) => SubLeagues, (sub) => sub.league_name, { eager: false })
   subLeagues: SubLeagues;
+  subsUser: SubsUsers;
 }

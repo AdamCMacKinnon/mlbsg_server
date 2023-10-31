@@ -3,22 +3,23 @@ import { SubsUsers } from './subsUsers.entity';
 import { User } from '../../auth/user.entity';
 import { Role } from '../../auth/enums/roles.enum';
 import { Logger } from '@nestjs/common';
-import { SubLeagues } from '../subs.entity';
 
 @EntityRepository(SubsUsers)
 export class SubsUsersRepository extends Repository<SubsUsers> {
-  async joinLeague(user: User, subLeagues: SubLeagues): Promise<void> {
-    console.log(subLeagues);
-    console.log(user);
+  async joinLeague(
+    user: User,
+    leagueName: string,
+    leagueId: string,
+  ): Promise<void> {
     try {
-      // logic to insert
       const join = this.create({
         league_role: Role.player,
         active: true,
         user,
-        subLeagues,
+        league_name: leagueName,
+        league_id: leagueId,
       });
-      Logger.log('JOINED LEAGUE!!');
+      Logger.log(`${user} joined league ${leagueName}`);
       await this.insert(join);
     } catch (error) {
       console.log(error);

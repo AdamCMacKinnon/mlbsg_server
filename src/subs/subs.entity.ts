@@ -3,11 +3,13 @@ import {
   Entity,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { GameType } from './enum/game-mode.enum';
 import { Exclude } from 'class-transformer';
 import { User } from '../auth/user.entity';
+import { SubsUsers } from './subsUsers/subsUsers.entity';
 
 @Entity('sub_leagues')
 export class SubLeagues {
@@ -32,6 +34,10 @@ export class SubLeagues {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, (user) => user.subleagues, { eager: false })
-  @Exclude({ toPlainOnly: true })
   user: User;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  @OneToMany((_type) => SubsUsers, (subsUser) => subsUser.active, {
+    eager: false,
+  })
+  subsUser: SubsUsers;
 }
