@@ -89,19 +89,19 @@ export class SubsService {
     }
   }
 
-  async getLeagueByUserId(id: string): Promise<SubLeagues> {
+  async getLeagueByUserId(id: string): Promise<SubLeagues[]> {
     try {
       const leagues = await this.subsRepository.query(
         `
-        SELECT league_id, passcode, league_name, active, game_mode
-        FROM sub_leagues
+        SELECT league_id, league_name, active, run_diff
+        FROM subleague_players
         WHERE "userId" = '${id}'
         `,
       );
       if (leagues.length === 0) {
         throw new Error(`User ${id} doesnt have any active leagues`);
       } else {
-        return leagues;
+        return [id, leagues];
       }
     } catch (error) {
       Logger.error(`ERROR IN SUBS SERVICE: ${error}`);

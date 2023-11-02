@@ -31,7 +31,7 @@ export class SubsController {
     return this.subsService.getLeagueBySubId(id);
   }
   @Get('/leagues/users/:id')
-  getLeaguesByUserId(@Param('id') id: string): Promise<SubLeagues> {
+  getLeaguesByUserId(@Param('id') id: string): Promise<SubLeagues[]> {
     return this.subsService.getLeagueByUserId(id);
   }
 }
