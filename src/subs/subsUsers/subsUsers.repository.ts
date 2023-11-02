@@ -19,10 +19,10 @@ export class SubsUsersRepository extends Repository<SubsUsers> {
         league_name: leagueName,
         league_id: leagueId,
       });
-      Logger.log(`${user} joined league ${leagueName}`);
+      Logger.log(`${user.username} joined league ${leagueName}`);
       await this.insert(join);
     } catch (error) {
-      console.log(error);
+      Logger.error(`Error inserting record to subs players table:  ${error}`);
     }
   }
 }

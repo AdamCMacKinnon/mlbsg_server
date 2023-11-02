@@ -41,11 +41,7 @@ export class SubsService {
     }
   }
 
-  async joinLeague(
-    joinLeagueDto: JoinLeagueDto,
-    user: User,
-    subLeagues: SubLeagues,
-  ): Promise<string> {
+  async joinLeague(joinLeagueDto: JoinLeagueDto, user: User): Promise<string> {
     const { passcode } = joinLeagueDto;
     try {
       const leagueInfo = await this.subsRepository.query(
@@ -56,7 +52,6 @@ export class SubsService {
         `,
         [passcode],
       );
-      console.log(leagueInfo[0]);
       const leagueName = leagueInfo[0].league_name;
       const leagueId = leagueInfo[0].league_id;
       if (leagueInfo.length === 0) {
@@ -103,14 +98,13 @@ export class SubsService {
         WHERE "userId" = '${id}'
         `,
       );
-      console.log(leagues.length);
       if (leagues.length === 0) {
         throw new Error(`User ${id} doesnt have any active leagues`);
       } else {
         return leagues;
       }
     } catch (error) {
-      console.log(error);
+      Logger.error(`ERROR IN SUBS SERVICE: ${error}`);
       throw new NotFoundException(`No Leagues found for user with id ${id}`);
     }
   }

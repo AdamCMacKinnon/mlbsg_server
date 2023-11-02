@@ -23,9 +23,8 @@ export class SubsController {
   joinLeague(
     @Body() joinLeagueDto: JoinLeagueDto,
     @GetUser() user: User,
-    @GetSubLeagues() subLeagues: SubLeagues,
   ): Promise<string> {
-    return this.subsService.joinLeague(joinLeagueDto, user, subLeagues);
+    return this.subsService.joinLeague(joinLeagueDto, user);
   }
   @Get('/leagues/:id')
   getLeagueBySubId(@Param('id') id: string): Promise<SubLeagues> {
