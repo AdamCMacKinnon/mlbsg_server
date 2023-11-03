@@ -29,7 +29,7 @@ import { SubsModule } from './subs/subs.module';
       migrations: ['dist/migrations*.js'],
       autoLoadEntities: true,
       migrationsRun: false,
-      synchronize: true,
+      synchronize: false,
       logging: true,
     }),
     SubsModule,
