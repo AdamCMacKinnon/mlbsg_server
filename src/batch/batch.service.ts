@@ -25,7 +25,7 @@ export class BatchService {
    */
   // runs every 5 minutes every day between March and November
   @Cron('0 */5 * * MAR-NOV *', {
-  // @Cron(CronExpression.EVERY_MINUTE, {
+    // @Cron(CronExpression.EVERY_MINUTE, {
     name: 'daily_score_updates',
     timeZone: 'America/New_York',
   })
