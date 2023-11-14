@@ -2,13 +2,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SubsRepository } from './subs.repository';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateLeagueDto } from './dto/create-league.dto';
-import { randomBytes } from 'crypto';
 import { User } from '../auth/user.entity';
 import { SubsUsersRepository } from './subsUsers/subsUsers.repository';
 import { SubLeagues } from './subs.entity';
 import { JoinLeagueDto } from './dto/join-league.dto';
 import { UpdateLeagueDto } from './dto/update-league.dto';
 import { generatePasscode } from '../utils/globals';
+import { Role } from '../auth/enums/roles.enum';
 
 @Injectable()
 export class SubsService {
@@ -22,20 +22,35 @@ export class SubsService {
     createLeagueDto: CreateLeagueDto,
     user: User,
   ): Promise<string> {
-    const { leagueName, gameMode } = createLeagueDto;
+    const { leagueName, commishEmail, gameMode } = createLeagueDto;
     try {
       const passCode = await generatePasscode();
+      const role = Role.commish;
       const newLeague = await this.subsRepository.createLeague(
         passCode,
         leagueName,
+        commishEmail,
         gameMode,
         user,
+        role,
       );
       if (!newLeague) {
         Logger.warn('League Failed to create!');
         return 'League Failed to Create!';
       } else {
         Logger.log(`New league created: ${leagueName}, PASSCODE: ${passCode}`);
+        const leagueId = await this.subsRepository.find({
+          where: {
+            passcode: passCode,
+          },
+        });
+        const thisLeague = leagueId[0].league_id;
+        await this.subsUsersRepository.joinLeague(
+          user,
+          leagueName,
+          thisLeague,
+          role,
+        );
         return passCode;
       }
     } catch (error) {
@@ -61,7 +76,13 @@ export class SubsService {
           `League with passcode ${passcode} not found.  Check the code and try again`,
         );
       } else {
-        await this.subsUsersRepository.joinLeague(user, leagueName, leagueId);
+        const role = Role.player;
+        await this.subsUsersRepository.joinLeague(
+          user,
+          leagueName,
+          leagueId,
+          role,
+        );
       }
       return 'SUCCESS JOINING LEAGUE!';
     } catch (error) {
@@ -121,8 +142,9 @@ export class SubsService {
     id: string,
     updateLeagueDto: UpdateLeagueDto,
   ): Promise<string> {
-    // TODO: Need to add "commish" and "closeReg" properties to update logic.
-    const { leagueName, commish, passcode, closeReg, active } = updateLeagueDto;
+    // TODO: Need to add "commish" and "regStatus" properties to update logic.
+    const { leagueName, commish, passcode, regStatus, active } =
+      updateLeagueDto;
     try {
       const existingLeague = await this.subsRepository.query(
         `
@@ -136,7 +158,9 @@ export class SubsService {
         await this.subsRepository.query(`
         UPDATE sub_leagues SET
         league_name = COALESCE('${leagueName}', league_name),
-        active = COALESCE(${active}, active)
+        active = COALESCE(${active}, active),
+        commish_email = COALESCE('${commish}', commish_email),
+        reg_status = COALESCE(${regStatus}, reg_status)
         WHERE league_id = '${id}';      
         `);
       } else {
