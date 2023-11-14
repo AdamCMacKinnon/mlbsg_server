@@ -4,14 +4,17 @@ import { Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { User } from '../auth/user.entity';
 import { GameType } from './enum/game-mode.enum';
+import { Role } from '../auth/enums/roles.enum';
 
 @EntityRepository(SubLeagues)
 export class SubsRepository extends Repository<SubLeagues> {
   async createLeague(
     passcode: string,
     leagueName: string,
+    commishEmail: string,
     gameMode: GameType,
     user: User,
+    role: Role,
   ): Promise<string> {
     const leagueId = randomUUID();
     try {
@@ -20,7 +23,9 @@ export class SubsRepository extends Repository<SubLeagues> {
         league_id: leagueId,
         league_name: leagueName,
         game_mode: gameMode,
+        commish_email: commishEmail,
         user,
+        league_role: role,
       });
       await this.insert(newLeague);
       return passcode;
