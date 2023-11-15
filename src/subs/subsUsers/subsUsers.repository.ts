@@ -17,7 +17,6 @@ export class SubsUsersRepository extends Repository<SubsUsers> {
         league_role: role,
         active: true,
         user,
-        league_name: leagueName,
         league_id: leagueId,
       });
       Logger.log(`${user.username} joined league ${leagueName}`);

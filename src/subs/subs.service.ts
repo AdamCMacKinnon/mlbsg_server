@@ -132,17 +132,10 @@ export class SubsService {
     }
   }
 
-  /**
-   * Need to think about security here.
-   * For example, if you have the league ID, you could potentially udpate any league info.
-   * It's super unlikely but will need to be accounted for before prod.
-   * For example, maybe add check where it validates token and compares userId = ID of league creator.
-   */
   async updateLeagueInfo(
     id: string,
     updateLeagueDto: UpdateLeagueDto,
   ): Promise<string> {
-    // TODO: Need to add "commish" and "regStatus" properties to update logic.
     const { leagueName, commish, passcode, regStatus, active } =
       updateLeagueDto;
     try {
@@ -153,30 +146,33 @@ export class SubsService {
         WHERE league_id = '${id}';
         `,
       );
-      console.log(existingLeague);
-      if (!passcode) {
+      if (!existingLeague) {
+        throw new NotFoundException(`League with ID ${id} doesnt exist!`);
+      } else {
         await this.subsRepository.query(`
         UPDATE sub_leagues SET
-        league_name = COALESCE('${leagueName}', league_name),
-        active = COALESCE(${active}, active),
-        commish_email = COALESCE('${commish}', commish_email),
-        reg_status = COALESCE(${regStatus}, reg_status)
+        passcode = COALESCE('${
+          passcode === undefined
+            ? existingLeague[0].passcode
+            : await generatePasscode()
+        }', passcode),
+        league_name = COALESCE('${
+          leagueName === undefined ? existingLeague[0].league_name : leagueName
+        }', league_name),
+        active = COALESCE(${
+          active === undefined ? existingLeague[0].active : active
+        }, active),
+        commish_email = COALESCE('${
+          commish === undefined ? existingLeague[0].commish_email : commish
+        }', commish_email),
+        reg_status = COALESCE('${
+          regStatus === undefined ? existingLeague[0].reg_status : regStatus
+        }', reg_status)
         WHERE league_id = '${id}';      
         `);
-      } else {
-        Logger.warn('Creating New Passcode!');
-        const newPasscode = await generatePasscode();
-        if (newPasscode) {
-          await this.subsRepository.query(`
-          UPDATE sub_leagues
-          SET passcode = '${newPasscode}'
-          WHERE league_id = '${id}';
-          `);
-          Logger.log('New Passcode updatd in DB');
-          return `New Passcode for ${leagueName}: ${newPasscode}`;
-        }
+        Logger.log(`League ${id} successfully updated.`);
+        return `League updated!`;
       }
-      return `League ${leagueName} updated!`;
     } catch (error) {
       Logger.error(`ERROR WHILE UPDATING LEAGUE INFO! ${error}`);
       return error;

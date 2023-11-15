@@ -66,6 +66,7 @@ export class AuthService {
   }
 
   async updateAccount(userUpdateDto: UserUpdateDto): Promise<User> {
+    // TAKE A LOOK AT HOW WE UPDATE SUBLEAGUE INFO!! USE THAT AS TEMPLATE HERE!
     const { username, email } = userUpdateDto;
     try {
       const userToUpdate = await this.usersRepository.findOne({

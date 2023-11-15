@@ -23,9 +23,6 @@ export class SubsUsers {
   @Column({ default: Role.player })
   league_role: Role;
 
-  @Column()
-  league_name: string;
-
   @Column({ default: 0 })
   run_diff: number;
 
