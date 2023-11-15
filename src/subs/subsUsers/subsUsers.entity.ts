@@ -1,10 +1,12 @@
 import { Exclude } from 'class-transformer';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../auth/user.entity';
 import { Role } from '../../auth/enums/roles.enum';
@@ -29,6 +31,14 @@ export class SubsUsers {
 
   @Column()
   league_id: string;
+
+  @Exclude({ toPlainOnly: true })
+  @CreateDateColumn({ type: 'timestamp', precision: 3 })
+  createdAt: Date;
+
+  @Exclude({ toPlainOnly: true })
+  @UpdateDateColumn({ type: 'timestamp', precision: 3 })
+  updatedAt: Date;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, (user) => user.subleagues, { eager: false })

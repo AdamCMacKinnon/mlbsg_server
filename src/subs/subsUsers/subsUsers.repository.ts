@@ -10,10 +10,11 @@ export class SubsUsersRepository extends Repository<SubsUsers> {
     user: User,
     leagueName: string,
     leagueId: string,
+    role: Role,
   ): Promise<void> {
     try {
       const join = this.create({
-        league_role: Role.player,
+        league_role: role,
         active: true,
         user,
         league_name: leagueName,
