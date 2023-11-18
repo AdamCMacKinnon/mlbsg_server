@@ -1,6 +1,11 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { SubsRepository } from './subs.repository';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateLeagueDto } from './dto/create-league.dto';
 import { User } from '../auth/user.entity';
 import { SubsUsersRepository } from './subsUsers/subsUsers.repository';
@@ -76,13 +81,29 @@ export class SubsService {
           `League with passcode ${passcode} not found.  Check the code and try again`,
         );
       } else {
-        const role = Role.player;
-        await this.subsUsersRepository.joinLeague(
-          user,
-          leagueName,
-          leagueId,
-          role,
+        const conflictCheck = await this.subsRepository.query(
+          `
+          SELECT *
+          FROM subleague_players
+          WHERE league_id = '${leagueId}'
+          AND "userId" = '${user.id}'
+          `,
         );
+        if (conflictCheck.length > 0) {
+          Logger.warn(
+            `User ${user.id} has already joined this league.  Entry denied.`,
+          );
+          // it's not throwing this error.  It logs the message but no return.  it will return a string but still a 201 code.
+          // throw new ConflictException('USER HAS ALREADY JOINED THIS LEAGUE!');
+        } else {
+          const role = Role.player;
+          await this.subsUsersRepository.joinLeague(
+            user,
+            leagueName,
+            leagueId,
+            role,
+          );
+        }
       }
       return 'SUCCESS JOINING LEAGUE!';
     } catch (error) {
