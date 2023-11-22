@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
-import { season } from '../utils/globals';
+import { season, temporaryPassword } from '../utils/globals';
 import { EmailService } from '../email/email.service';
 import { BatchRepository } from '../batch/batch.repository';
 import { randomBytes } from 'crypto';
@@ -66,16 +66,35 @@ export class AuthService {
   }
 
   async updateAccount(userUpdateDto: UserUpdateDto): Promise<User> {
-    // TAKE A LOOK AT HOW WE UPDATE SUBLEAGUE INFO!! USE THAT AS TEMPLATE HERE!
-    const { username, email } = userUpdateDto;
+    /**
+     * This query works as expected as long as both username and email are populated in request body.
+     * We need to ensure that we can send only part of the request but also that we can pass the ID in the request as well.
+     * Ideally, we could get the ID from the client side and maybe pass as a request header?
+     */
+
+    const { username, email, password } = userUpdateDto;
+    const salt = await bcrypt.genSalt();
     try {
       const userToUpdate = await this.usersRepository.findOne({
         where: [{ email }, { username }],
       });
-      userToUpdate.username = username;
-      userToUpdate.email = email;
-
-      await this.usersRepository.save(userToUpdate);
+      await this.usersRepository.query(
+        `
+        UPDATE public.user SET
+        username = COALESCE('${
+          username === undefined ? userToUpdate.email : username
+        }', username),
+        email = COALESCE('${
+          email === undefined ? userToUpdate.email : email
+        }', email),
+        password = COALESCE('${
+          password === undefined
+            ? userToUpdate.password
+            : await bcrypt.hash(password, salt)
+        }')
+        WHERE id = '${userToUpdate.id}'
+        `,
+      );
       Logger.log(`User information successfully updated!`);
       return userToUpdate;
     } catch (error) {
@@ -130,7 +149,7 @@ export class AuthService {
       if (!user) {
         throw new NotFoundException('The username or email entered is invalid');
       } else {
-        const temp = randomBytes(6).toString('hex').toUpperCase() + '!a';
+        const temp = await temporaryPassword();
         Logger.log('Temporary Password Generated!');
         const salt = await bcrypt.genSalt();
         const updatePassHash = await bcrypt.hash(temp, salt);
