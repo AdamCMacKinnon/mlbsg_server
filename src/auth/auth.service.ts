@@ -91,7 +91,7 @@ export class AuthService {
           password === undefined
             ? userToUpdate.password
             : await bcrypt.hash(password, salt)
-        }')
+        }', password)
         WHERE id = '${userToUpdate.id}'
         `,
       );
