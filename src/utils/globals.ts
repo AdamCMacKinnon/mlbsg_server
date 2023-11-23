@@ -11,3 +11,8 @@ export const season = `2023-2`;
 export async function generatePasscode() {
   return randomBytes(8).toString('hex');
 }
+
+// generate temporary new user password
+export async function temporaryPassword() {
+  return randomBytes(6).toString('hex').toUpperCase() + '!a';
+}
