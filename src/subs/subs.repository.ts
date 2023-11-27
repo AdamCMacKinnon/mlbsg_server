@@ -14,7 +14,6 @@ export class SubsRepository extends Repository<SubLeagues> {
     commishEmail: string,
     gameMode: GameType,
     user: User,
-    role: Role,
   ): Promise<string> {
     const leagueId = randomUUID();
     try {
@@ -25,7 +24,6 @@ export class SubsRepository extends Repository<SubLeagues> {
         game_mode: gameMode,
         commish_email: commishEmail,
         user,
-        league_role: role,
       });
       await this.insert(newLeague);
       return passcode;
@@ -34,5 +32,4 @@ export class SubsRepository extends Repository<SubLeagues> {
       return error;
     }
   }
-  // async joinLeague(league_id: string);
 }

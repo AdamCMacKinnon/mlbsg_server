@@ -27,15 +27,13 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ default: true })
-  isactive: boolean;
-
-  // This needs to be moved to the subleague table.
-  @Column({ default: Role.player })
+  @Exclude()
+  @Column({ default: Role.user })
   role: Role;
 
-  @Column({ default: 0 })
-  diff: number;
+  // isactive = user level.  if user has no leagues registered to them, list as FALSE.  Otherwise TRUE.
+  @Column({ default: true })
+  isactive: boolean;
 
   @Column({ default: 0 })
   career_diff: number;
@@ -49,8 +47,8 @@ export class User {
   updatedAt: Date;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @OneToMany((_type) => Picks, (pick) => pick.user, { eager: true })
-  picks: Picks[];
+  // @OneToMany((_type) => Picks, (pick) => pick.user, { eager: true })
+  // picks: Picks[];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => SubLeagues, (sub) => sub.user, { eager: true })
   subleagues: SubLeagues[];

@@ -28,7 +28,7 @@ export class AuthController {
   }
   @Get('refreshtoken/:id')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.player, Role.admin)
+  @Roles(Role.admin, Role.user, Role.player)
   refreshToken(
     @Param('id') id: string,
     refreshToken: string,
@@ -47,7 +47,7 @@ export class AuthController {
   }
   @Patch('/update')
   @UseGuards(AuthGuard('jwt'), RolesGuard)
-  @Roles(Role.player, Role.admin)
+  @Roles(Role.user, Role.player, Role.admin)
   updateAccount(@Body() userUpdateDto: UserUpdateDto): Promise<User> {
     return this.authService.updateAccount(userUpdateDto);
   }
