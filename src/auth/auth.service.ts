@@ -13,10 +13,9 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
-import { season, temporaryPassword } from '../utils/globals';
+import { temporaryPassword } from '../utils/globals';
 import { EmailService } from '../email/email.service';
 import { BatchRepository } from '../batch/batch.repository';
-import { randomBytes } from 'crypto';
 @Injectable()
 export class AuthService {
   private Logger = new Logger('UserService');
@@ -113,12 +112,6 @@ export class AuthService {
           id: id,
         },
       });
-      // this is super duper ugly, but it will work for now
-      for (let p = userById.picks.length - 1; p >= 0; --p) {
-        if (userById.picks[p].season !== season) {
-          userById.picks.splice(p, 1);
-        }
-      }
       Logger.log(`ID ${userById.id} Returned Successfully`);
       return userById;
     } catch (error) {

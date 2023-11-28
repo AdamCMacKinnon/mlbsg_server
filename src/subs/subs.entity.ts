@@ -34,9 +34,6 @@ export class SubLeagues {
   active: boolean;
 
   @Column()
-  league_role: Role;
-
-  @Column()
   commish_email: string;
 
   @Column({ default: RegistrationStatus.open })

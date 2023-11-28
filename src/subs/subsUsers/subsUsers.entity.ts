@@ -20,7 +20,7 @@ export class SubsUsers {
   @Column({ default: true })
   active: boolean;
 
-  @Column({ default: Role.player })
+  @Column()
   league_role: Role;
 
   @Column({ default: 0 })

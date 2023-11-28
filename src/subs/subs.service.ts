@@ -30,14 +30,12 @@ export class SubsService {
     const { leagueName, commishEmail, gameMode } = createLeagueDto;
     try {
       const passCode = await generatePasscode();
-      const role = Role.commish;
       const newLeague = await this.subsRepository.createLeague(
         passCode,
         leagueName,
         commishEmail,
         gameMode,
         user,
-        role,
       );
       if (!newLeague) {
         Logger.warn('League Failed to create!');
@@ -50,6 +48,7 @@ export class SubsService {
           },
         });
         const thisLeague = leagueId[0].league_id;
+        const role = Role.commish;
         await this.subsUsersRepository.joinLeague(
           user,
           leagueName,
