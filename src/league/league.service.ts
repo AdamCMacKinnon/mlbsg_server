@@ -5,6 +5,8 @@ import { baseUrl, currentDayEndpoint } from '../utils/globals';
 import axios from 'axios';
 import { BatchRepository } from '../batch/batch.repository';
 import { season } from '../utils/globals';
+import { JobType } from '../batch/enum/jobType.enum';
+import { JobStatus } from '../batch/enum/jobStatus.enum';
 
 /**
  * Daily Update Status Codes:
@@ -29,14 +31,14 @@ export class LeagueService {
 
   async dailyLeagueUpdate(date: any, week: number): Promise<string> {
     const url = `${baseUrl}/${currentDayEndpoint}&startDate=${date}&endDate=${date}`;
-    console.log(url);
     try {
       const response = await axios.get(url);
-      const totalGames = response.data.totalItems;
+      const totalGames = response.data.totalGames;
       if (!totalGames) {
         const message = 'There are no Games scheduled today!!';
         Logger.warn(message);
-        return message;
+        const jobStatus = JobStatus.blank;
+        return jobStatus;
       } else {
         const data = response.data.dates[0].games;
         for (let x = 0; x < totalGames; x++) {
@@ -67,12 +69,7 @@ export class LeagueService {
       }
     } catch (error) {
       console.log(error);
-      if (error.includes('TypeError: Cannot read properties of undefined')) {
-        Logger.warn('NO GAMES SCHEDULED TODAY!');
-      } else {
-        Logger.error(`THERE WAS AN ERROR! ${error}`);
-      }
-
+      Logger.error(`THERE WAS AN ERROR! ${error}`);
       return error;
     }
   }
