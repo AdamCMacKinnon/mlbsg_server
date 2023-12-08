@@ -25,6 +25,7 @@ export class PicksRepository extends Repository<Picks> {
     }
   }
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
+    // temp subleague value: d730ee25-08bd-408c-9536-000a6e39148c
     try {
       const { week, pick, subleague_id } = makePicksDto;
       const pickId = await getPickId(user);

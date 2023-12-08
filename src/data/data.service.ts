@@ -18,7 +18,7 @@ export class DataService {
     try {
       const userList = await this.usersRepository
         .createQueryBuilder('user')
-        .select(['username', 'diff', 'isactive'])
+        .select(['username', 'career_diff', 'isactive'])
         .where({ isactive: true })
         .execute();
       Logger.log(`${userList.length} Users returned for Leaderboard`);
@@ -35,11 +35,11 @@ export class DataService {
     try {
       const totalList = await this.usersRepository.query(
         `
-        SELECT username, diff
+        SELECT username, career_diff
         FROM public.user
-        JOIN picks ON public.user.id=picks."userId"
+        JOIN picks ON public.user.id=picks."userId"::uuid
         GROUP BY public.user.id
-        ORDER BY diff DESC;
+        ORDER BY career_diff DESC;
         `,
       );
       return totalList;

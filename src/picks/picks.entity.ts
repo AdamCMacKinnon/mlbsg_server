@@ -27,7 +27,7 @@ export class Picks {
   season: string;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @ManyToOne((_type) => User, (user) => user.picks, { eager: false })
-  // @Exclude({ toPlainOnly: true })
-  // user: User;
+  @ManyToOne((_type) => User, (user) => user.picks, { eager: false })
+  @Exclude({ toPlainOnly: true })
+  user: User;
 }

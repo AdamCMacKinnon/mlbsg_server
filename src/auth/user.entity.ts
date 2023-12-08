@@ -47,8 +47,8 @@ export class User {
   updatedAt: Date;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @OneToMany((_type) => Picks, (pick) => pick.user, { eager: true })
-  // picks: Picks[];
+  @OneToMany((_type) => Picks, (pick) => pick.user, { eager: true })
+  picks: Picks[];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => SubLeagues, (sub) => sub.user, { eager: true })
   subleagues: SubLeagues[];
