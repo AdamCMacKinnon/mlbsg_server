@@ -191,6 +191,13 @@ export class SubsService {
         WHERE league_id = '${id}';      
         `);
         Logger.log(`League ${id} successfully updated.`);
+        if (leagueName) {
+          await this.subsUsersRepository.query(`
+          UPDATE subleague_users
+          SET league_name = '${leagueName}'
+          WHERE league_id = '${id}'
+          `);
+        }
         return `League updated!`;
       }
     } catch (error) {

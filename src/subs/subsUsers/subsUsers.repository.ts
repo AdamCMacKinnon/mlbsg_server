@@ -18,6 +18,7 @@ export class SubsUsersRepository extends Repository<SubsUsers> {
         active: true,
         user,
         league_id: leagueId,
+        league_name: leagueName,
       });
       Logger.log(`${user.username} joined league ${leagueName}`);
       await this.insert(join);
