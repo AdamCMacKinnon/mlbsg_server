@@ -136,7 +136,7 @@ export class SubsService {
     try {
       const leagues = await this.subsRepository.query(
         `
-        SELECT league_id, league_name, active, run_diff
+        SELECT league_id, active, run_diff
         FROM subleague_players
         WHERE "userId" = '${id}'
         `,
