@@ -29,6 +29,9 @@ export class SubsUsers {
   @Column()
   league_id: string;
 
+  @Column()
+  league_name: string;
+
   @Exclude({ toPlainOnly: true })
   @CreateDateColumn({ type: 'timestamp', precision: 3 })
   createdAt: Date;
