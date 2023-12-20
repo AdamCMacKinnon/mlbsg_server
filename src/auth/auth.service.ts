@@ -77,23 +77,38 @@ export class AuthService {
       const userToUpdate = await this.usersRepository.findOne({
         where: [{ email }, { username }],
       });
-      await this.usersRepository.query(
-        `
-        UPDATE public.user SET
-        username = COALESCE('${
-          username === undefined ? userToUpdate.email : username
-        }', username),
-        email = COALESCE('${
-          email === undefined ? userToUpdate.email : email
-        }', email),
-        password = COALESCE('${
-          password === undefined
-            ? userToUpdate.password
-            : await bcrypt.hash(password, salt)
-        }', password)
-        WHERE id = '${userToUpdate.id}'
-        `,
-      );
+      if (!password) {
+        await this.usersRepository.query(
+          `
+          UPDATE public.user SET
+          username = COALESCE('${
+            username === undefined ? userToUpdate.email : username
+          }', username),
+          email = COALESCE('${
+            email === undefined ? userToUpdate.email : email
+          }', email)
+          WHERE id = '${userToUpdate.id}'
+          `,
+        );
+      } else {
+        await this.usersRepository.query(
+          `
+          UPDATE public.user SET
+          username = COALESCE('${
+            username === undefined ? userToUpdate.email : username
+          }', username),
+          email = COALESCE('${
+            email === undefined ? userToUpdate.email : email
+          }', email),
+          password = COALESCE('${
+            password === undefined
+              ? userToUpdate.password
+              : await bcrypt.hash(password, salt)
+          }', password)
+          WHERE id = '${userToUpdate.id}'
+          `,
+        );
+      }
       Logger.log(`User information successfully updated!`);
       return userToUpdate;
     } catch (error) {

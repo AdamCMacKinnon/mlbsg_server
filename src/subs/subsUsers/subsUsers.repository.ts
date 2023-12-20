@@ -16,6 +16,7 @@ export class SubsUsersRepository extends Repository<SubsUsers> {
       const join = this.create({
         league_role: role,
         active: true,
+        league_name: leagueName,
         user,
         league_id: leagueId,
       });

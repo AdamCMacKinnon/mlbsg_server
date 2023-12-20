@@ -15,9 +15,9 @@ import { GetUser } from '../auth/decorators/get-user.decorator';
 import { JoinLeagueDto } from './dto/join-league.dto';
 import { SubLeagues } from './subs.entity';
 import { UpdateLeagueDto } from './dto/update-league.dto';
-// import { RolesGuard } from '../auth/roles.guard';
-// import { Role } from '../auth/enums/roles.enum';
-// import { Roles } from '../auth/decorators/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { Role } from '../auth/enums/roles.enum';
+import { Roles } from '../auth/decorators/roles.decorator';
 @Controller('subs')
 @UseGuards(AuthGuard('jwt'))
 export class SubsController {
@@ -51,8 +51,8 @@ export class SubsController {
    * That will be a separate PR, delete this comment and uncomment guards in this file when complete.
    */
   @Patch('/leagues/update/:id')
-  // @UseGuards(RolesGuard)
-  // @Roles(Role.commish, Role.admin)
+  @UseGuards(RolesGuard)
+  @Roles(Role.commish, Role.admin)
   updateLeagueInfo(
     @Param('id') id: string,
     @Body() updateLeagueDto: UpdateLeagueDto,
