@@ -93,7 +93,7 @@ export class SubsService {
             `User ${user.id} has already joined this league.  Entry denied.`,
           );
           // it's not throwing this error.  It logs the message but no return.  it will return a string but still a 201 code.
-          // throw new ConflictException('USER HAS ALREADY JOINED THIS LEAGUE!');
+          throw new ConflictException('USER HAS ALREADY JOINED THIS LEAGUE!');
         } else {
           const role = Role.player;
           await this.subsUsersRepository.joinLeague(

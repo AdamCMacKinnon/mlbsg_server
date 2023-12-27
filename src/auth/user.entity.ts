@@ -28,7 +28,7 @@ export class User {
   email: string;
 
   @Exclude()
-  @Column({ default: Role.user })
+  @Column({ default: Role.player })
   role: Role;
 
   // isactive = user level.  if user has no leagues registered to them, list as FALSE.  Otherwise TRUE.
@@ -50,8 +50,8 @@ export class User {
   @OneToMany((_type) => Picks, (pick) => pick.user, { eager: true })
   picks: Picks[];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @OneToMany((_type) => SubLeagues, (sub) => sub.user, { eager: true })
-  subleagues: SubLeagues[];
+  // @OneToMany((_type) => SubLeagues, (sub) => sub.user, { eager: true })
+  // subleagues: SubLeagues[];
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => SubsUsers, (subUser) => subUser.user, { eager: true })
   subsUsers: SubsUsers[];

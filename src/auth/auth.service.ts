@@ -30,10 +30,10 @@ export class AuthService {
 
   async register(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     await this.usersRepository.createUser(authCredentialsDto);
-    await this.emailService.welcomeEmail(
-      authCredentialsDto.email,
-      authCredentialsDto.username,
-    );
+    // await this.emailService.welcomeEmail(
+    //   authCredentialsDto.email,
+    //   authCredentialsDto.username,
+    // );
   }
 
   async login(
