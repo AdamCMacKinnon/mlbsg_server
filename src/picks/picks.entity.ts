@@ -20,6 +20,9 @@ export class Picks {
   @Column()
   userId: string;
 
+  @Column()
+  league_id: string;
+
   @Column({ default: `${season}` })
   season: string;
 

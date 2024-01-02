@@ -17,7 +17,7 @@ import { UpdateDiffDto } from './dto/update-diff.dto';
 
 @Controller('admin')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-@Roles(Role.admin)
+@Roles(Role.admin, Role.commish)
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
@@ -38,7 +38,7 @@ export class AdminController {
   }
   @Patch('/updateDiffByTeam')
   updateRunDiff(@Body() updateDiffDto: UpdateDiffDto) {
-    return this.adminService.updateRunDiff(updateDiffDto);
+    return this.adminService.updateCareerRunDiff(updateDiffDto);
   }
   @Delete('/deleteUser/:id')
   deleteUser(

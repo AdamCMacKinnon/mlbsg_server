@@ -7,7 +7,6 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { User } from './user.entity';
 import * as bcrypt from 'bcryptjs';
 import { GetUsersFilterDto } from '../admin/dto/get-users-filter.dto';
-
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
   async createUser(authCredentialsDto: AuthCredentialsDto): Promise<void> {
@@ -23,9 +22,10 @@ export class UsersRepository extends Repository<User> {
     });
     try {
       await this.save(user);
+      console.log(user);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException('Username already exists!');
+        throw new ConflictException('Username or Email already exists!');
       } else {
         throw new InternalServerErrorException(error);
       }

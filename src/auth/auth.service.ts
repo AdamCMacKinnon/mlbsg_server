@@ -13,9 +13,9 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { UserUpdateDto } from './dto/user-update.dto';
 import { User } from './user.entity';
-import { season } from '../utils/globals';
+import { temporaryPassword } from '../utils/globals';
+import { EmailService } from '../email/email.service';
 import { BatchRepository } from '../batch/batch.repository';
-import { format } from 'date-fns';
 @Injectable()
 export class AuthService {
   private Logger = new Logger('UserService');
@@ -25,19 +25,15 @@ export class AuthService {
     @InjectRepository(BatchRepository)
     private batchRepository: BatchRepository,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async register(authCredentialsDto: AuthCredentialsDto): Promise<void> {
-    const date = format(new Date(), 'yyyy-LL-dd');
-    const week = await this.batchRepository.getWeekQuery(date);
-    console.log(week);
-    if (week >= 1) {
-      throw new NotFoundException(
-        'Cannot Register new user as registration period has closed.',
-      );
-    } else {
-      return this.usersRepository.createUser(authCredentialsDto);
-    }
+    await this.usersRepository.createUser(authCredentialsDto);
+    // await this.emailService.welcomeEmail(
+    //   authCredentialsDto.email,
+    //   authCredentialsDto.username,
+    // );
   }
 
   async login(
@@ -69,20 +65,50 @@ export class AuthService {
   }
 
   async updateAccount(userUpdateDto: UserUpdateDto): Promise<User> {
+    /**
+     * This query works as expected as long as both username and email are populated in request body.
+     * We need to ensure that we can send only part of the request but also that we can pass the ID in the request as well.
+     * Ideally, we could get the ID from the client side and maybe pass as a request header?
+     */
+
     const { username, email, password } = userUpdateDto;
+    const salt = await bcrypt.genSalt();
     try {
       const userToUpdate = await this.usersRepository.findOne({
         where: [{ email }, { username }],
       });
-      userToUpdate.username = username;
-      userToUpdate.email = email;
-
-      if (password) {
-        const salt = await bcrypt.genSalt();
-        const updatePassHash = await bcrypt.hash(password, salt);
-        userToUpdate.password = updatePassHash;
+      if (!password) {
+        await this.usersRepository.query(
+          `
+          UPDATE public.user SET
+          username = COALESCE('${
+            username === undefined ? userToUpdate.email : username
+          }', username),
+          email = COALESCE('${
+            email === undefined ? userToUpdate.email : email
+          }', email)
+          WHERE id = '${userToUpdate.id}'
+          `,
+        );
+      } else {
+        await this.usersRepository.query(
+          `
+          UPDATE public.user SET
+          username = COALESCE('${
+            username === undefined ? userToUpdate.email : username
+          }', username),
+          email = COALESCE('${
+            email === undefined ? userToUpdate.email : email
+          }', email),
+          password = COALESCE('${
+            password === undefined
+              ? userToUpdate.password
+              : await bcrypt.hash(password, salt)
+          }', password)
+          WHERE id = '${userToUpdate.id}'
+          `,
+        );
       }
-      await this.usersRepository.save(userToUpdate);
       Logger.log(`User information successfully updated!`);
       return userToUpdate;
     } catch (error) {
@@ -101,12 +127,6 @@ export class AuthService {
           id: id,
         },
       });
-      // this is super duper ugly, but it will work for now
-      for (let p = userById.picks.length - 1; p >= 0; --p) {
-        if (userById.picks[p].season !== season) {
-          userById.picks.splice(p, 1);
-        }
-      }
       Logger.log(`ID ${userById.id} Returned Successfully`);
       return userById;
     } catch (error) {
@@ -124,6 +144,35 @@ export class AuthService {
     } else {
       const refresh = await this.jwtService.verify(refreshToken);
       return refresh;
+    }
+  }
+
+  async passwordReset(userUpdateDto: UserUpdateDto): Promise<string> {
+    const { username, email } = userUpdateDto;
+    try {
+      const user = await this.usersRepository.findOne({
+        where: { email },
+      });
+      console.log(user);
+      if (!user) {
+        throw new NotFoundException('The username or email entered is invalid');
+      } else {
+        const temp = await temporaryPassword();
+        Logger.log('Temporary Password Generated!');
+        const salt = await bcrypt.genSalt();
+        const updatePassHash = await bcrypt.hash(temp, salt);
+        user.password = updatePassHash;
+        const userEmail = email;
+        Logger.log(`Password Reset Email sent to ${email}`);
+        await this.usersRepository.save(user);
+        await this.emailService.passwordResetEmail(userEmail, username, temp);
+      }
+      return `Password Reset Success!  Email sent to ${email}`;
+    } catch (error) {
+      Logger.error('ERROR RESETTING PASSWORD! ---- ' + error.stack);
+      throw new NotFoundException(
+        'There was an internal error resetting password',
+      );
     }
   }
 }

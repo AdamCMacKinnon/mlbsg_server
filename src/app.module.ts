@@ -9,7 +9,10 @@ import { DataModule } from './data/data.module';
 import { LeagueModule } from './league/league.module';
 import { EmailModule } from './email/email.module';
 import { BatchModule } from './batch/batch.module';
-// ONLY set Synchornize to TRUE when schemas are being updated.  Requires separate PR
+import { SubsModule } from './subs/subs.module';
+
+// ONLY set Synchornize to TRUE when schemas are being updated on local.
+// Use DATA Module to retrieve SQL scripts.
 
 @Module({
   imports: [
@@ -24,11 +27,13 @@ import { BatchModule } from './batch/batch.module';
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
       migrations: ['dist/migrations*.js'],
+      entities: ['dist/**/**/*.entity.js'],
       autoLoadEntities: true,
-      migrationsRun: false,
-      synchronize: false,
+      migrationsRun: true,
+      synchronize: true,
       logging: true,
     }),
+    SubsModule,
     BatchModule,
     PicksModule,
     HealthModule,

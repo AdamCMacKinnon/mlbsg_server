@@ -23,50 +23,72 @@ export class BatchService {
    * user_update = updates run differential on user table
    * ** For local testing, use CronExpression Enum for every 30 seconds.
    */
-  // runs every 10 minutes every day
-  // @Cron('0 */10 * * * *', {
-  //   name: 'daily_score_updates',
-  //   timeZone: 'America/New_York',
-  // })
-  // async getApiData() {
-  //   Logger.log('Daily League Job');
-  //   const jobType = JobType.daily_api_update;
-  //   const date = format(new Date(), 'yyyy-LL-dd');
-  //   const week = await this.batchRepository.getWeekQuery(date);
-  //   const apiCall = await this.leagueService.dailyLeagueUpdate(date, week);
-  //   const getData = this.schedulerRegistry.getCronJob('daily_score_updates');
-  //   getData.start();
-  //   const jobStatus =
-  //     apiCall.length > 0 ? JobStatus.success : JobStatus.failure;
-  //   await this.batchRepository.batchJobData(jobType, jobStatus);
-  //   if (jobStatus === JobStatus.failure) {
-  //     await this.emailService.batchAlert(jobType);
-  //   }
-  // }
+  // runs every 5 minutes every day between March and November
+  @Cron('0 */5 * * MAR-NOV *', {
+    // @Cron(CronExpression.EVERY_MINUTE, {
+    name: 'daily_score_updates',
+    timeZone: 'America/New_York',
+  })
+  async getApiData() {
+    Logger.log('Daily League Job');
+    try {
+      const jobType = JobType.daily_api_update;
+      const date = format(new Date(), 'yyyy-LL-dd');
+      const week = await this.batchRepository.getWeekQuery(date);
+      const apiCall = await this.leagueService.dailyLeagueUpdate(date, week);
+      const getData = this.schedulerRegistry.getCronJob('daily_score_updates');
+      getData.start();
+      let jobStatus: JobStatus;
+      if (apiCall === JobStatus.blank) {
+        jobStatus = JobStatus.blank;
+      } else {
+        jobStatus === JobStatus.success;
+      }
+      await this.batchRepository.batchJobData(jobType, jobStatus);
+    } catch (error) {
+      Logger.error('ERROR IN DAILY BATCH JOB **** ' + error);
+      const jobStatus = JobStatus.failure;
+      const jobType = JobType.daily_api_update;
+      await this.batchRepository.batchJobData(jobType, jobStatus);
+      await this.emailService.batchAlert(jobType);
+    }
+  }
 
-  // // runs at 7AM to get the previous days results if the game passes the daily updates.
-  // @Cron('0 7 * * *', {
-  //   name: 'previous_day_cleanup',
-  //   timeZone: 'America/New_York',
-  // })
-  // async prevDay() {
-  //   Logger.log('Daily Score cleanup job');
-  //   const jobType = JobType.daily_api_cleanup;
-  //   const date = format(subDays(new Date(), 1), 'yyyy-LL-dd');
-  //   Logger.log(`Getting Game Data for ${date}`);
-  //   const week = await this.batchRepository.getWeekQuery(date);
-  //   const updateCall = await this.leagueService.dailyLeagueUpdate(date, week);
-  //   const cleanup = this.schedulerRegistry.getCronJob('previous_day_cleanup');
-  //   cleanup.start();
-  //   const jobStatus =
-  //     updateCall.length > 0 ? JobStatus.success : JobStatus.failure;
-  //   await this.batchRepository.batchJobData(jobType, jobStatus);
-  //   if (jobStatus === JobStatus.failure) {
-  //     await this.emailService.batchAlert(jobType);
-  //   }
-  // }
+  // runs at 7AM to get the previous days results if the game passes the daily updates.
+  @Cron('0 7 * * MAR-NOV *', {
+    name: 'previous_day_cleanup',
+    timeZone: 'America/New_York',
+  })
+  async prevDay() {
+    Logger.log('Daily Score cleanup job');
+    try {
+      const jobType = JobType.daily_api_cleanup;
+      const date = format(subDays(new Date(), 1), 'yyyy-LL-dd');
+      Logger.log(`Getting Game Data for ${date}`);
+      const week = await this.batchRepository.getWeekQuery(date);
+      const updateCall = await this.leagueService.dailyLeagueUpdate(date, week);
+      const cleanup = this.schedulerRegistry.getCronJob('previous_day_cleanup');
+      cleanup.start();
+      let jobStatus: JobStatus;
+      if (updateCall === JobStatus.blank) {
+        jobStatus = JobStatus.blank;
+      } else {
+        jobStatus === JobStatus.success;
+      }
+      await this.batchRepository.batchJobData(jobType, jobStatus);
+    } catch (error) {
+      Logger.error('ERROR IN DAILY BATCH CLEANUP JOB **** ' + error);
+      const jobStatus = JobStatus.failure;
+      const jobType = JobType.daily_api_cleanup;
+      await this.batchRepository.batchJobData(jobType, jobStatus);
+      await this.emailService.batchAlert(jobType);
+    }
+  }
 
-  // // runs every Monday at 7am that updates the diff column on the user table.
+  // runs every Monday at 7am that updates the diff column on the user table.
+  /** TO DO:
+   * Refactor this job to handle "NO RECORD" job status
+   */
   // @Cron('0 0 07 * * 1', { name: 'user_update', timeZone: 'America/New_York' })
   // async updateUserbase() {
   //   const jobType = JobType.user_diff_update;

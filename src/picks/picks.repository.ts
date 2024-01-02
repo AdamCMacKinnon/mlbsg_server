@@ -10,7 +10,13 @@ import { season } from '../utils/globals';
 export class PicksRepository extends Repository<Picks> {
   async getUserPicks(user: User): Promise<Picks[]> {
     try {
-      const picks = await this.query.arguments(user);
+      const picks = await this.query(
+        `
+        SELECT *
+        FROM picks
+        WHERE "userId" = ${user.id}
+        `,
+      );
       Logger.log(`Picks for ${user.id} successfully retrieved`);
       return picks;
     } catch (error) {
@@ -19,18 +25,20 @@ export class PicksRepository extends Repository<Picks> {
     }
   }
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
+    // temp subleague value: d730ee25-08bd-408c-9536-000a6e39148c
     try {
-      const { week, pick } = makePicksDto;
+      const { week, pick, subleague_id } = makePicksDto;
       const pickId = await getPickId(user);
       const userPick = this.create({
         pickId,
         week,
         pick,
-        user,
+        userId: user.id,
+        league_id: subleague_id,
         season,
       });
       Logger.log(
-        `PICK ID:${userPick.pickId}, WEEK:${userPick.week}, TEAM: ${userPick.pick}, USER: ${user.username}!`,
+        `PICK ID:${userPick.pickId}, WEEK:${userPick.week}, TEAM: ${userPick.pick}, USER: ${user.username}, LEAGUE: ${userPick.league_id}!`,
       );
       await this.save(userPick);
       return userPick;
