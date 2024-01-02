@@ -51,7 +51,8 @@ export class SubLeagues {
   updatedAt: Date;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  @ManyToOne((_type) => User, (user) => user.subleagues, { eager: false })
+  @Exclude({ toPlainOnly: true })
+  @ManyToOne((_type) => User, (user) => user.subsUsers, { eager: false })
   user: User;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @OneToMany((_type) => SubsUsers, (subsUser) => subsUser.active, {
