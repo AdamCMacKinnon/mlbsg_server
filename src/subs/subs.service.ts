@@ -117,13 +117,6 @@ export class SubsService {
 
   async getLeagueBySubId(id: string): Promise<SubLeagues> {
     try {
-      // const leagues = await this.subsRepository.query(
-      //   `
-      //   SELECT passcode, league_id, league_name, active, game_mode
-      //   FROM sub_leagues
-      //   WHERE league_id = '${id}'
-      //   `,
-      // );
       const leagues = await this.subsRepository.query(
         `
         SELECT p."userId", u.username,i.week,i.pick,i.run_diff as weekly_diff, p.run_diff as league_diff
