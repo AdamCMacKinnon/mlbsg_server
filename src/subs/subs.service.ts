@@ -62,7 +62,10 @@ export class SubsService {
     }
   }
 
-  async joinLeague(joinLeagueDto: JoinLeagueDto, user: User): Promise<string> {
+  async joinLeague(
+    joinLeagueDto: JoinLeagueDto,
+    user: User,
+  ): Promise<SubLeagues> {
     const { passcode } = joinLeagueDto;
     try {
       const leagueInfo = await this.subsRepository.query(
@@ -104,7 +107,7 @@ export class SubsService {
           );
         }
       }
-      return 'SUCCESS JOINING LEAGUE!';
+      return leagueInfo;
     } catch (error) {
       throw new NotFoundException(
         `League with passcode ${passcode} not found.  Check the code and try again`,
@@ -116,9 +119,11 @@ export class SubsService {
     try {
       const leagues = await this.subsRepository.query(
         `
-        SELECT passcode, league_id, league_name, active, game_mode
-        FROM sub_leagues
-        WHERE league_id = '${id}'
+        SELECT p."userId", u.username,i.week,i.pick,i.run_diff as weekly_diff, p.run_diff as league_diff
+        FROM subleague_players as p
+        JOIN public.user as u ON p."userId"=u.id
+        LEFT JOIN picks as i ON p."userId"=i."userId"
+        WHERE p.league_id = '${id}';
         `,
       );
       if (leagues.length === 0) {
