@@ -7,15 +7,19 @@ import { JobStatus } from './enum/jobStatus.enum';
 @EntityRepository(Batch)
 export class BatchRepository extends Repository<Batch> {
   async getWeekQuery(date: string) {
-    const week = await this.query(
-      `
-      SELECT week::INTEGER
-      FROM schedule_weeks
-      WHERE $1 BETWEEN start_date AND end_date;
-      `,
-      [date],
-    );
-    return week[0].week;
+    try {
+      const week = await this.query(
+        `
+        SELECT week::INTEGER
+        FROM schedule_weeks
+        WHERE $1 BETWEEN start_date AND end_date;
+        `,
+        [date],
+      );
+      return week[0].week;
+    } catch (error) {
+      Logger.error(`Unable to get Week! ${error}`);
+    }
   }
   async batchJobData(jobType: JobType, jobStatus: JobStatus): Promise<void> {
     try {

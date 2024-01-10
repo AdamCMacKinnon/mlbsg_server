@@ -14,6 +14,8 @@ import { JoinLeagueDto } from './dto/join-league.dto';
 import { UpdateLeagueDto } from './dto/update-league.dto';
 import { generatePasscode } from '../utils/globals';
 import { Role } from '../auth/enums/roles.enum';
+import { BatchRepository } from '../batch/batch.repository';
+import { format } from 'date-fns';
 
 @Injectable()
 export class SubsService {
@@ -22,6 +24,8 @@ export class SubsService {
     private subsRepository: SubsRepository,
     @InjectRepository(SubsUsersRepository)
     private subsUsersRepository: SubsUsersRepository,
+    @InjectRepository(BatchRepository)
+    private batchRepository: BatchRepository,
   ) {}
   async createLeague(
     createLeagueDto: CreateLeagueDto,
@@ -117,13 +121,17 @@ export class SubsService {
 
   async getLeagueBySubId(id: string): Promise<SubLeagues> {
     try {
+      const date = format(new Date(), 'yyyy-LL-dd');
+      const week = await this.batchRepository.getWeekQuery(date);
       const leagues = await this.subsRepository.query(
         `
         SELECT p."userId", u.username,i.week,i.pick,i.run_diff as weekly_diff, p.run_diff as league_diff
         FROM subleague_players as p
         JOIN public.user as u ON p."userId"=u.id
         LEFT JOIN picks as i ON p."userId"=i."userId"
-        WHERE p.league_id = '${id}';
+        WHERE p.league_id = '${id}'
+        AND i.week = ${week}
+        ORDER BY weekly_diff DESC;
         `,
       );
       if (leagues.length === 0) {
