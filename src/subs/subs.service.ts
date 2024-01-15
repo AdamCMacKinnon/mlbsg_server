@@ -125,8 +125,9 @@ export class SubsService {
       const week = await this.batchRepository.getWeekQuery(date);
       const leagues = await this.subsRepository.query(
         `
-        SELECT p."userId", u.username,i.week,i.pick,i.run_diff as weekly_diff, p.run_diff as league_diff
+        SELECT p."userId", u.username,u.email,i.week,i.pick,i.run_diff as weekly_diff, p.run_diff as league_diff,p.league_role as role, l.passcode
         FROM subleague_players as p
+        JOIN sub_leagues as l ON p.league_id=l.league_id
         JOIN public.user as u ON p."userId"=u.id
         LEFT JOIN picks as i ON p."userId"=i."userId"
         WHERE p.league_id = '${id}'
