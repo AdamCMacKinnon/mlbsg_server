@@ -60,13 +60,11 @@ export class PicksRepository extends Repository<Picks> {
       );
       await this.save(userPick);
       return userPick;
-    } catch (error) {
+    } catch (error: any) {
       Logger.error(
         `An ERROR OCCURED WHILE MAKING PICK FOR ${user.id}: ${error}`,
       );
-      throw new InternalServerErrorException(
-        `Error While Saving User Picks.  Contact Support or Try Again`,
-      );
+      return error;
     }
   }
 }
