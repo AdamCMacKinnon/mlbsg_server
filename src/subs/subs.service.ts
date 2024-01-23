@@ -4,6 +4,7 @@ import {
   ConflictException,
   Injectable,
   Logger,
+  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateLeagueDto } from './dto/create-league.dto';
@@ -123,23 +124,20 @@ export class SubsService {
     try {
       const date = format(new Date(), 'yyyy-LL-dd');
       const week = await this.batchRepository.getWeekQuery(date);
+      console.log(week);
       const leagues = await this.subsRepository.query(
         `
-        SELECT p."userId", u.username,u.email,i.week,i.pick,i.run_diff as weekly_diff, p.run_diff as league_diff,p.league_role as role, l.passcode
+        SELECT p."userId", p.league_id, u.username,u.email,i.week,i.pick,i.run_diff as weekly_diff, COALESCE(i.league_id, 'NA'), p.run_diff as league_diff,p.league_role as role, p.active,l.passcode
         FROM subleague_players as p
         JOIN sub_leagues as l ON p.league_id=l.league_id
         JOIN public.user as u ON p."userId"=u.id
         LEFT JOIN picks as i ON p."userId"=i."userId"
         WHERE p.league_id = '${id}'
-        AND i.week = ${week}
-        ORDER BY weekly_diff DESC;
+        AND i.league_id = '${id}'
+        ORDER BY league_diff DESC;
         `,
       );
-      if (leagues.length === 0) {
-        throw new Error(`No League with ID ${id}`);
-      } else {
-        return leagues;
-      }
+      return leagues;
     } catch (error) {
       Logger.error(error);
       throw new NotFoundException(`No League with ID ${id}`);

@@ -1,4 +1,8 @@
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { User } from '../auth/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { MakePicksDto } from './dto/make-picks.dto';
@@ -25,9 +29,23 @@ export class PicksRepository extends Repository<Picks> {
     }
   }
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
-    // temp subleague value: d730ee25-08bd-408c-9536-000a6e39148c
     try {
       const { week, pick, subleague_id } = makePicksDto;
+      const checkPicks = await this.query(`
+      SELECT week, pick
+      FROM picks
+      WHERE "userId" = '${user.id}'
+      AND league_id = '${subleague_id}'
+      `);
+      for (let p = 0; p < checkPicks.length; p++) {
+        if (checkPicks[p].week === week) {
+          throw new ConflictException('User Already Picked for this Week!');
+        } else if (checkPicks.pick[p] === pick) {
+          throw new ConflictException('User Already Picked that Team!');
+        } else {
+          p++;
+        }
+      }
       const pickId = await getPickId(user);
       const userPick = this.create({
         pickId,
