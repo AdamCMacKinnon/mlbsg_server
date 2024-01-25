@@ -46,8 +46,8 @@ export class SubsController {
     return this.subsService.getLeagueByUserId(id);
   }
   @Patch('/leagues/update/:id')
-  @UseGuards(RolesGuard)
-  @Roles(Role.commish, Role.admin)
+  // @UseGuards(RolesGuard)
+  // @Roles(Role.commish, Role.admin)
   updateLeagueInfo(
     @Param('id') id: string,
     @Body() updateLeagueDto: UpdateLeagueDto,

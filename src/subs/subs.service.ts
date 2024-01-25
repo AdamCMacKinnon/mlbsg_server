@@ -189,7 +189,9 @@ export class SubsService {
             : await generatePasscode()
         }', passcode),
         league_name = COALESCE('${
-          leagueName === undefined ? existingLeague[0].league_name : leagueName
+          leagueName === undefined || null
+            ? existingLeague[0].league_name
+            : leagueName
         }', league_name),
         active = COALESCE(${
           active === undefined ? existingLeague[0].active : active
@@ -202,7 +204,19 @@ export class SubsService {
         }', reg_status)
         WHERE league_id = '${id}';      
         `);
-        Logger.log(`League ${id} successfully updated.`);
+        Logger.log(`League ${id} successfully updated Subleagues Table.`);
+        await this.subsRepository.query(
+          `
+          UPDATE subleague_players
+          SET
+          league_name = COALESCE('${
+            leagueName === undefined || null
+              ? existingLeague[0].league_name
+              : leagueName
+          }', league_name)
+          WHERE league_id = '${id}';  
+          `,
+        );
         return `League updated!`;
       }
     } catch (error) {
