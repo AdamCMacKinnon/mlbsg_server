@@ -40,11 +40,15 @@ export class PicksRepository extends Repository<Picks> {
       for (let p = 0; p < checkPicks.length; p++) {
         if (checkPicks[p].week === week) {
           throw new ConflictException('User Already Picked for this Week!');
-        } else if (checkPicks.pick[p] === pick) {
+        } else if (checkPicks[p].pick === pick) {
           throw new ConflictException('User Already Picked that Team!');
         } else {
           p++;
         }
+        if (checkPicks[p].week === week || checkPicks[p].pick === pick) {
+          throw new ConflictException('Week or Team are not unique!');
+        }
+        p++;
       }
       const pickId = await getPickId(user);
       const userPick = this.create({
@@ -62,7 +66,7 @@ export class PicksRepository extends Repository<Picks> {
       return userPick;
     } catch (error: any) {
       Logger.error(
-        `An ERROR OCCURED WHILE MAKING PICK FOR ${user.id}: ${error}`,
+        `An ERROR OCCURED WHILE MAKING PICK FOR ${user.id}: ${error.stack[0]}`,
       );
       return error;
     }

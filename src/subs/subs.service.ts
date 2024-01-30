@@ -123,8 +123,7 @@ export class SubsService {
   async getLeagueBySubId(id: string): Promise<SubLeagues> {
     try {
       const date = format(new Date(), 'yyyy-LL-dd');
-      const week = await this.batchRepository.getWeekQuery(date);
-      console.log(week);
+      const week: number = await this.batchRepository.getWeekQuery(date);
       const leagues = await this.subsRepository.query(
         `
         SELECT p."userId", p.league_id, u.username,u.email,i.week,i.pick,i.run_diff as weekly_diff, COALESCE(i.league_id, 'NA'), p.run_diff as league_diff,p.league_role as role, p.active,l.passcode
@@ -134,6 +133,7 @@ export class SubsService {
         LEFT JOIN picks as i ON p."userId"=i."userId"
         WHERE p.league_id = '${id}'
         AND i.league_id = '${id}'
+        AND i.week=${week}
         ORDER BY league_diff DESC;
         `,
       );
