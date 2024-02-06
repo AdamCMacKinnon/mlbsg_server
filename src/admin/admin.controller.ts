@@ -14,10 +14,12 @@ import { RolesGuard } from '../auth/roles.guard';
 import { User } from '../auth/user.entity';
 import { AdminService } from './admin.service';
 import { UpdateDiffDto } from './dto/update-diff.dto';
+import { SetUserStatusDto } from './dto/set-status.dto';
+import { set } from 'date-fns';
 
 @Controller('admin')
 @UseGuards(AuthGuard('jwt'), RolesGuard)
-@Roles(Role.admin, Role.commish)
+@Roles(Role.admin, Role.commish, Role.player)
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
@@ -30,11 +32,8 @@ export class AdminController {
     return this.adminService.getUserById(id);
   }
   @Patch('/eliminate')
-  elimUsers(
-    @Body('username')
-    usernames: string[],
-  ) {
-    return this.adminService.elimByUsername(usernames);
+  elimUsers(@Body() setUserStatusDto: SetUserStatusDto) {
+    return this.adminService.elimUsers(setUserStatusDto);
   }
   @Patch('/updateDiffByTeam')
   updateRunDiff(@Body() updateDiffDto: UpdateDiffDto) {
@@ -44,7 +43,9 @@ export class AdminController {
   deleteUser(
     @Param('id')
     id: string,
-  ): Promise<void> {
-    return this.adminService.deleteUser(id);
+    @Body()
+    data: any,
+  ): Promise<string> {
+    return this.adminService.deleteUser(id, data);
   }
 }
