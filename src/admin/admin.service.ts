@@ -6,6 +6,7 @@ import { UsersRepository } from '../auth/users.repository';
 import { UpdateDiffDto } from './dto/update-diff.dto';
 import { PicksRepository } from '../picks/picks.repository';
 import { Picks } from '../picks/picks.entity';
+import { SetUserStatusDto } from './dto/set-status.dto';
 
 @Injectable()
 export class AdminService {
@@ -29,19 +30,18 @@ export class AdminService {
     });
     return userById;
   }
-  async elimByUsername(usernames: string[]) {
-    const updateStatus = await this.usersRepository
-      .createQueryBuilder()
-      .update(User)
-      .set({ isactive: false })
-      .where({ username: In(usernames) })
-      .execute();
-
-    if (updateStatus.affected === 0) {
-      Logger.warn('No users Eliminated!');
-    } else {
-      Logger.log(`${updateStatus.affected} Users Eliminated!`);
-    }
+  async elimUsers(setUserStatusDto: SetUserStatusDto) {
+    const updateStatus = await this.usersRepository.query(`
+    UPDATE subleague_players
+    SET active = ${setUserStatusDto.isactive}
+    WHERE "userId" = '${setUserStatusDto.userForUpdate}'::uuid
+    AND league_id = '${setUserStatusDto.leagueid}'
+    `);
+    Logger.log(
+      `USER ${setUserStatusDto.userForUpdate} MARKED AS ${
+        setUserStatusDto.isactive === true ? 'ACTIVE' : 'INACTIVE'
+      }`,
+    );
     return updateStatus;
   }
   async updateCareerRunDiff(updateDiffDto: UpdateDiffDto) {
@@ -80,13 +80,23 @@ export class AdminService {
     }
     return updateDiff;
   }
-  async deleteUser(id: string): Promise<void> {
+  async deleteUser(id: string, data: any): Promise<string> {
     try {
-      const result = await this.usersRepository.delete({ id });
+      const result = await this.usersRepository.query(
+        `
+        DELETE
+        FROM subleague_players
+        WHERE "userId" = '${id}'
+        AND league_id = '${data.leagueid}'
+        `,
+      );
       if (result.affected === 0) {
-        throw new NotFoundException(`No User with id ${id}`);
+        throw new NotFoundException(
+          `No User with id ${id} or League ID is invalid`,
+        );
       } else {
-        Logger.warn(`User Deleted Successfully`);
+        Logger.warn(`User Deleted From Subleague Successfully`);
+        return 'User Deleted';
       }
     } catch (error) {
       Logger.error(`AN ERROR OCCURED WHILE DELETING USER: ${error.message}`);
