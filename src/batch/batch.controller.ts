@@ -1,11 +1,11 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { BatchRepository } from './batch.repository';
 
 @Controller('batch')
 export class BatchController {
   constructor(private batchRepository: BatchRepository) {}
-  @Get('/getweek')
-  getWeekForClient(@Body() date: string): Promise<string> {
+  @Get('/getweek/:date')
+  getWeekForClient(@Param('date') date: string): Promise<number> {
     return this.batchRepository.getWeekQuery(date);
   }
 }
