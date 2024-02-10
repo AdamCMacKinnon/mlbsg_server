@@ -34,11 +34,14 @@ export class PicksRepository extends Repository<Picks> {
       WHERE "userId" = '${user.id}'
       AND league_id = '${subleague_id}'
       `);
-      if (checkPicks.includes(week)) {
-        throw new ConflictException('User Already Picked for that week!');
-      } else if (checkPicks.includes(pick)) {
-        throw new ConflictException('User Already Picked that Team!');
+      console.log(checkPicks);
+      const uniqueCheck = checkPicks.map(
+        (p: any) => p.week === week || p.pick === pick,
+      );
+      if (uniqueCheck.includes(true)) {
+        throw new ConflictException('Week or Team are Not Unique!');
       }
+      console.log(uniqueCheck);
       const pickId = await getPickId(user);
       const userPick = this.create({
         pickId,
