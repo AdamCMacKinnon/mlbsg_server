@@ -1,15 +1,10 @@
-import {
-  ConflictException,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { ConflictException, Logger } from '@nestjs/common';
 import { User } from '../auth/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { MakePicksDto } from './dto/make-picks.dto';
 import { Picks } from './picks.entity';
 import { getPickId } from './pickIdGenerator';
 import { season } from '../utils/globals';
-import { check } from 'prettier';
 
 @EntityRepository(Picks)
 export class PicksRepository extends Repository<Picks> {
