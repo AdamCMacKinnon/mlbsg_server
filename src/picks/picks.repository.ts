@@ -9,6 +9,7 @@ import { MakePicksDto } from './dto/make-picks.dto';
 import { Picks } from './picks.entity';
 import { getPickId } from './pickIdGenerator';
 import { season } from '../utils/globals';
+import { check } from 'prettier';
 
 @EntityRepository(Picks)
 export class PicksRepository extends Repository<Picks> {
@@ -31,24 +32,17 @@ export class PicksRepository extends Repository<Picks> {
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
     try {
       const { week, pick, subleague_id } = makePicksDto;
+      console.log(week);
       const checkPicks = await this.query(`
       SELECT week, pick
       FROM picks
       WHERE "userId" = '${user.id}'
       AND league_id = '${subleague_id}'
       `);
-      for (let p = 0; p < checkPicks.length; p++) {
-        if (checkPicks[p].week === week) {
-          throw new ConflictException('User Already Picked for this Week!');
-        } else if (checkPicks[p].pick === pick) {
-          throw new ConflictException('User Already Picked that Team!');
-        } else {
-          p++;
-        }
-        if (checkPicks[p].week === week || checkPicks[p].pick === pick) {
-          throw new ConflictException('Week or Team are not unique!');
-        }
-        p++;
+      if (checkPicks.includes(week)) {
+        throw new ConflictException('User Already Picked for that week!');
+      } else if (checkPicks.includes(pick)) {
+        throw new ConflictException('User Already Picked that Team!');
       }
       const pickId = await getPickId(user);
       const userPick = this.create({
@@ -66,7 +60,7 @@ export class PicksRepository extends Repository<Picks> {
       return userPick;
     } catch (error: any) {
       Logger.error(
-        `An ERROR OCCURED WHILE MAKING PICK FOR ${user.id}: ${error.stack[0]}`,
+        `An ERROR OCCURED WHILE MAKING PICK FOR ${user.id}: ${error.message}`,
       );
       return error;
     }
