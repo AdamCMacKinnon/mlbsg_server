@@ -121,7 +121,7 @@ export class SubsService {
 
   async getLeagueBySubId(id: string): Promise<SubLeagues> {
     try {
-      const leagues = await this.subsRepository.query(
+      let leagues = await this.subsRepository.query(
         `
         SELECT p."userId", p.league_id, p.active, u.username,u.email,i.week,i.pick,i.run_diff as weekly_diff, COALESCE(i.league_id, 'NA'), p.run_diff as league_diff,p.league_role as role, p.active,l.passcode
         FROM subleague_players as p
@@ -133,6 +133,18 @@ export class SubsService {
         ORDER BY league_diff DESC;
         `,
       );
+      if (leagues.length === 0) {
+        leagues = await this.subsRepository.query(
+          `
+          SELECT p."userId", p.league_id, p.active, u.username,u.email, p.run_diff as league_diff,p.league_role as role, p.active,l.passcode
+          FROM subleague_players as p
+          JOIN sub_leagues as l ON p.league_id=l.league_id
+          JOIN public.user as u ON p."userId"=u.id
+          WHERE p.league_id = '${id}'
+          ORDER BY league_diff DESC;
+          `,
+        );
+      }
       return leagues;
     } catch (error) {
       Logger.error(error);
