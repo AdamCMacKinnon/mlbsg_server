@@ -24,7 +24,7 @@ export class BatchService {
    * ** For local testing, use CronExpression Enum for every 30 seconds.
    */
   // runs every 5 minutes every day between March and November
-  @Cron('0 */5 * * MAR-NOV *', {
+  @Cron('0 */5 * * * *', {
     // @Cron(CronExpression.EVERY_MINUTE, {
     name: 'daily_score_updates',
     timeZone: 'America/New_York',
@@ -55,7 +55,7 @@ export class BatchService {
   }
 
   // runs at 7AM to get the previous days results if the game passes the daily updates.
-  @Cron('0 7 * * MAR-NOV *', {
+  @Cron('0 7 * * * *', {
     name: 'previous_day_cleanup',
     timeZone: 'America/New_York',
   })
@@ -89,21 +89,30 @@ export class BatchService {
   /** TO DO:
    * Refactor this job to handle "NO RECORD" job status
    */
-  // @Cron('0 0 07 * * 1', { name: 'user_update', timeZone: 'America/New_York' })
-  // async updateUserbase() {
-  //   const jobType = JobType.user_diff_update;
-  //   const date = format(endOfYesterday(), 'yyyy-LL-dd');
-  //   const week = await this.batchRepository.getWeekQuery(date);
-  //   const userUpdate = await this.leagueService.updateUserDiffs(week);
-  //   const diffupdate = this.schedulerRegistry.getCronJob('user_update');
-  //   diffupdate.start();
-  //   const jobStatus =
-  //     userUpdate.length > 0 ? JobStatus.success : JobStatus.failure;
-  //   await this.batchRepository.batchJobData(jobType, jobStatus);
-  //   if (jobStatus === JobStatus.failure) {
-  //     await this.emailService.batchAlert(jobType);
-  //   }
-  // }
+  @Cron('0 0 07 * * 1', { name: 'user_update', timeZone: 'America/New_York' })
+  async updateUserbase() {
+    try {
+      const jobType = JobType.user_diff_update;
+      const date = format(endOfYesterday(), 'yyyy-LL-dd');
+      const week = await this.batchRepository.getWeekQuery(date);
+      const userUpdate = await this.leagueService.updateUserDiffs(week);
+      const diffupdate = this.schedulerRegistry.getCronJob('user_update');
+      diffupdate.start();
+      let jobStatus: JobStatus;
+      if (userUpdate.length === 0) {
+        jobStatus = JobStatus.blank;
+      } else {
+        jobStatus === JobStatus.success;
+      }
+      await this.batchRepository.batchJobData(jobType, jobStatus);
+    } catch (error) {
+      Logger.error('ERROR IN WEEKLY USER UPDATE **** ' + error);
+      const jobStatus = JobStatus.failure;
+      const jobType = JobType.user_diff_update;
+      await this.batchRepository.batchJobData(jobType, jobStatus);
+      await this.emailService.batchAlert(jobType);
+    }
+  }
   /**
    * EMAIL CRON JOBS
    * blank_active_users = users who show as active, but have not made a pick for the upcoming week
