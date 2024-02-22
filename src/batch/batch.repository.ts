@@ -22,6 +22,7 @@ export class BatchRepository extends Repository<Batch> {
     }
   }
   async batchJobData(jobType: JobType, jobStatus: JobStatus): Promise<void> {
+    console.log(jobType, jobStatus);
     try {
       console.log('REPO LEVEL!! ***** ' + jobStatus);
       const batch = this.create({
