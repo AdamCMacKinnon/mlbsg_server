@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BatchRepository } from './batch.repository';
 import { EmailService } from '../email/email.service';
 import { JobStatus } from './enum/jobStatus.enum';
+import { UpdateFlag } from './enum/updateFlag.enum';
 @Injectable()
 export class BatchService {
   constructor(
@@ -79,34 +80,67 @@ export class BatchService {
     }
   }
 
-  // runs every Monday at 7am that updates the diff column on the user table.
-  /** TO DO:
-   * Refactor this job to handle "NO RECORD" job status
+  /**
+   * runs once daily at 6am with "RUN_DIFF" flag to update user diffs once a day
+   * TO DO: write logic where it can update every api update without aggregating diff
+   * would allow for users to see run diffs update in real time.
    */
-  // @Cron('0 0 07 * * 1', { name: 'user_update', timeZone: 'America/New_York' })
-  // async updateUserbase() {
-  //   try {
-  //     const jobType = JobType.user_diff_update;
-  //     const date = format(endOfYesterday(), 'yyyy-LL-dd');
-  //     const week = await this.batchRepository.getWeekQuery(date);
-  //     const userUpdate = await this.leagueService.updateUserDiffs(week);
-  //     const diffupdate = this.schedulerRegistry.getCronJob('user_update');
-  //     diffupdate.start();
-  //     let jobStatus: JobStatus;
-  //     if (userUpdate.length === 0) {
-  //       jobStatus = JobStatus.blank;
-  //     } else {
-  //       jobStatus === JobStatus.success;
-  //     }
-  //     await this.batchRepository.batchJobData(jobType, jobStatus);
-  //   } catch (error) {
-  //     Logger.error('ERROR IN WEEKLY USER UPDATE **** ' + error);
-  //     const jobStatus = JobStatus.failure;
-  //     const jobType = JobType.user_diff_update;
-  //     await this.batchRepository.batchJobData(jobType, jobStatus);
-  //     await this.emailService.batchAlert(jobType);
-  //   }
-  // }
+  @Cron(CronExpression.EVERY_MINUTE, {
+    // @Cron('0 6 * * * ', {
+    name: 'user_diff_update',
+    timeZone: 'America/New_York',
+  })
+  async updateUserDiff() {
+    try {
+      const jobType = JobType.user_diff_update;
+      const updateFlag = UpdateFlag.diff;
+      const date = format(endOfYesterday(), 'yyyy-LL-dd');
+      const week = await this.batchRepository.getWeekQuery(date);
+      const userUpdate = await this.leagueService.updateUserJobs(
+        week,
+        updateFlag,
+      );
+      const diffupdate = this.schedulerRegistry.getCronJob('user_diff_update');
+      diffupdate.start();
+      const jobStatus =
+        userUpdate.length <= 0 ? JobStatus.blank : JobStatus.success;
+      await this.batchRepository.batchJobData(jobType, jobStatus);
+    } catch (error) {
+      Logger.error('ERROR IN WEEKLY USER UPDATE **** ' + error);
+      const jobStatus = JobStatus.failure;
+      const jobType = JobType.user_diff_update;
+      await this.batchRepository.batchJobData(jobType, jobStatus);
+      await this.emailService.batchAlert(jobType);
+    }
+  }
+
+  /**
+   * UpdateUserStatus job runs once a week, 7am on Sundays
+   * Checks user diff, if it's less than or equal to zero
+   * set active to false
+   */
+  @Cron('0 0 07 * * 1', {
+    name: 'update_user_status',
+    timeZone: 'America/New_York',
+  })
+  async updateUserStatus() {
+    const jobType = JobType.user_status_update;
+    const updateFlag = UpdateFlag.status;
+    const date = format(endOfYesterday(), 'yyyy-LL-dd');
+    const week = await this.batchRepository.getWeekQuery(date);
+    const statusUpdate = await this.leagueService.updateUserJobs(
+      week,
+      updateFlag,
+    );
+    const userStatus = await this.schedulerRegistry.getCronJob(
+      'user_status_update',
+    );
+    userStatus.start();
+    const jobStatus =
+      statusUpdate.length <= 0 ? JobStatus.blank : JobStatus.success;
+    await this.batchRepository.batchJobData(jobType, jobStatus);
+  }
+
   /**
    * EMAIL CRON JOBS
    * blank_active_users = users who show as active, but have not made a pick for the upcoming week

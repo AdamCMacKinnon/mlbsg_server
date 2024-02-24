@@ -7,6 +7,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { LeagueService } from './league.service';
+import { UpdateFlag } from '../batch/enum/updateFlag.enum';
 
 @Controller('league')
 export class LeagueController {
@@ -20,8 +21,11 @@ export class LeagueController {
     return this.leagueService.dailyLeagueUpdate(date, week);
   }
   @Post('/userUpdates')
-  updateUserDiffs(@Body('week', ParseIntPipe) week: number): Promise<string[]> {
-    return this.leagueService.updateUserDiffs(week);
+  updateUserDiffs(
+    @Body('week', ParseIntPipe) week: number,
+    updateFlag: UpdateFlag,
+  ): Promise<string[]> {
+    return this.leagueService.updateUserJobs(week, updateFlag);
   }
   @Get('/diffByTeam/:week/:team?')
   diffsByTeam(
