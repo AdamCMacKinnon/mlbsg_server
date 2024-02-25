@@ -100,6 +100,7 @@ export class LeagueRepository extends Repository<League> {
           );
           break;
         case UpdateFlag.profile:
+          // this will be added as a later feature
           break;
         default:
           Logger.warn('DEFAULT SWITCH CASE IN UPDATE FLAG');

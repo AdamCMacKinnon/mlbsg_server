@@ -85,8 +85,8 @@ export class BatchService {
    * TO DO: write logic where it can update every api update without aggregating diff
    * would allow for users to see run diffs update in real time.
    */
-  @Cron(CronExpression.EVERY_MINUTE, {
-    // @Cron('0 6 * * * ', {
+  // @Cron(CronExpression.EVERY_MINUTE, {
+  @Cron('0 6 * * * ', {
     name: 'user_diff_update',
     timeZone: 'America/New_York',
   })
@@ -115,11 +115,11 @@ export class BatchService {
   }
 
   /**
-   * UpdateUserStatus job runs once a week, 7am on Sundays
+   * UpdateUserStatus job runs once a week, 7am on Mondays
    * Checks user diff, if it's less than or equal to zero
    * set active to false
    */
-  @Cron('0 0 07 * * 1', {
+  @Cron('0 7 * * 1', {
     name: 'update_user_status',
     timeZone: 'America/New_York',
   })
