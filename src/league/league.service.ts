@@ -5,8 +5,8 @@ import { baseUrl, currentDayEndpoint } from '../utils/globals';
 import axios from 'axios';
 import { BatchRepository } from '../batch/batch.repository';
 import { season } from '../utils/globals';
-import { JobType } from '../batch/enum/jobType.enum';
 import { JobStatus } from '../batch/enum/jobStatus.enum';
+import { UpdateFlag } from '../batch/enum/updateFlag.enum';
 
 /**
  * Daily Update Status Codes:
@@ -74,7 +74,10 @@ export class LeagueService {
     }
   }
 
-  async updateUserDiffs(week: number): Promise<string[]> {
+  async updateUserJobs(
+    week: number,
+    updateFlag: UpdateFlag,
+  ): Promise<string[]> {
     try {
       const query = await this.leagueRepository.query(
         `
@@ -100,7 +103,13 @@ export class LeagueService {
       for (let q = 0; q < query.length; q++) {
         const team = query[q].team;
         const diff = query[q].diff;
-        await this.leagueRepository.updateUserDiff(diff, team, week, season);
+        await this.leagueRepository.updateUsers(
+          diff,
+          team,
+          week,
+          season,
+          updateFlag,
+        );
       }
       return query;
     } catch (error) {
