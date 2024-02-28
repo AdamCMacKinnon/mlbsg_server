@@ -5,7 +5,8 @@
  */
 
 export enum UpdateFlag {
-  diff = 'RUN_DIFF',
+  realtime_diff = 'RUN_DIFF',
+  weekly_diff = 'LEAGUE_DIFF',
   status = 'STATUS',
   profile = 'PROFILE',
 }
