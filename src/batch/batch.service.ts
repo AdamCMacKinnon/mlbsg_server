@@ -121,7 +121,7 @@ export class BatchService {
     try {
       const jobType = JobType.user_weekly_diff_update;
       const updateFlag = UpdateFlag.weekly_diff;
-      const date = format(endOfYesterday(), 'yyyy-LL-dd');
+      const date = format(subDays(new Date(), 1), 'yyyy-LL-dd');
       const week = await this.batchRepository.getWeekQuery(date);
       const weeklyUserUpdate = await this.leagueService.updateUserJobs(
         week,
