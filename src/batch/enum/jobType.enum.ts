@@ -5,4 +5,5 @@ export enum JobType {
   daily_api_cleanup = 'daily_api_cleanup',
   user_diff_update = 'user_diff_update',
   user_status_update = 'user_status_update',
+  user_weekly_diff_update = 'user_weekly_diff_update',
 }

@@ -74,7 +74,7 @@ export class LeagueRepository extends Repository<League> {
         [diff, team, week, season],
       );
       switch (updateFlag) {
-        case UpdateFlag.diff:
+        case UpdateFlag.realtime_diff:
           // runs once a day
           await this.query(
             `
@@ -99,8 +99,20 @@ export class LeagueRepository extends Repository<League> {
             `,
           );
           break;
-        case UpdateFlag.profile:
-          // this will be added as a later feature
+        case UpdateFlag.weekly_diff:
+          // runs once a week to update the users overall diff
+          await this.query(
+            `
+              UPDATE subleague_players as s
+              SET run_diff = s.run_diff + $1
+              FROM picks AS p
+              WHERE p."userId" = s."userId"
+                AND p.pick = $2
+                AND p.week = $3
+                AND p.season = $4
+              `,
+            [diff, team, week, season],
+          );
           break;
         default:
           Logger.warn('DEFAULT SWITCH CASE IN UPDATE FLAG');
