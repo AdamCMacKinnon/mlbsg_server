@@ -79,7 +79,7 @@ export class LeagueRepository extends Repository<League> {
           await this.query(
             `
               UPDATE subleague_players as s
-              SET run_diff = s.run_diff + $1
+              SET run_diff = $1
               FROM picks AS p
               WHERE p."userId" = s."userId"
                 AND p.pick = $2
