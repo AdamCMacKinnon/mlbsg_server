@@ -21,6 +21,24 @@ export class BatchRepository extends Repository<Batch> {
       Logger.error(`Unable to get Week! ${error}`);
     }
   }
+
+  async getDatesForWeek(week: number) {
+    try {
+      const dates = await this.query(
+        `
+        SELECT *
+        FROM schedule_weeks
+        WHERE week = $1
+        `,
+        [week],
+      );
+      console.log(dates);
+      return dates;
+    } catch (error) {
+      Logger.error(`ERROR GETTING DATES FOR WEEK: ${error}`);
+    }
+  }
+
   async batchJobData(jobType: JobType, jobStatus: JobStatus): Promise<void> {
     console.log(jobType, jobStatus);
     try {
