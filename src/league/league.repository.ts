@@ -62,35 +62,26 @@ export class LeagueRepository extends Repository<League> {
     updateFlag: UpdateFlag,
   ): Promise<void> {
     try {
-      // run this query no matter what.  Updates team scores/diffs.
-      await this.query(
-        `
-            UPDATE picks
-            SET run_diff = $1
-            WHERE pick = $2
-            AND week = $3
-            AND season = $4
-            `,
-        [diff, team, week, season],
-      );
+      /**
+       * Switch statement reads the update flag and determines which query to run.
+       * realtime_diff = updates picks table with run diff every 5 mins after 9AM
+       * status = flips players from active to inactive once a week if diff is less than 1
+       * weekly_diff = once a week, Mondays at 5am, aggregates diff from previous week to existing run_diff on subleague_players table
+       */
       switch (updateFlag) {
         case UpdateFlag.realtime_diff:
-          // runs once a day
           await this.query(
             `
-              UPDATE subleague_players as s
-              SET run_diff = $1
-              FROM picks AS p
-              WHERE p."userId" = s."userId"
-                AND p.pick = $2
-                AND p.week = $3
-                AND p.season = $4
-              `,
+                UPDATE picks
+                SET run_diff = $1
+                WHERE pick = $2
+                AND week = $3
+                AND season = $4
+                `,
             [diff, team, week, season],
           );
           break;
         case UpdateFlag.status:
-          // runs once a week
           await this.query(
             `
             UPDATE subleague_players
@@ -100,11 +91,10 @@ export class LeagueRepository extends Repository<League> {
           );
           break;
         case UpdateFlag.weekly_diff:
-          // runs once a week to update the users overall diff
           await this.query(
             `
               UPDATE subleague_players as s
-              SET run_diff = s.run_diff + $1
+              SET run_diff = run_diff + $1
               FROM picks AS p
               WHERE p."userId" = s."userId"
                 AND p.pick = $2
