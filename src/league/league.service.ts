@@ -87,13 +87,13 @@ export class LeagueService {
           UNION ALL
           SELECT game_pk, away_team, away_diff
           FROM game_data
-          WHERE week=$1
-          AND season=$2
           ) 
           SELECT team, SUM(run_diff) AS diff
           FROM teams
           JOIN game_data
           ON teams.game_pk=game_data.game_pk
+		      WHERE week = $1
+		      AND season = $2
           GROUP BY team
           ORDER BY SUM(run_diff) DESC;
         `,
