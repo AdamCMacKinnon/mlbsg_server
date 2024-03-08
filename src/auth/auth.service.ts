@@ -153,7 +153,6 @@ export class AuthService {
       const user = await this.usersRepository.findOne({
         where: { email },
       });
-      console.log(user);
       if (!user) {
         throw new NotFoundException('The username or email entered is invalid');
       } else {

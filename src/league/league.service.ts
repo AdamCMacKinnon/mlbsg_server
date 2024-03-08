@@ -68,7 +68,6 @@ export class LeagueService {
         return data;
       }
     } catch (error) {
-      console.log(error);
       Logger.error(`THERE WAS AN ERROR! ${error}`);
       return error;
     }
@@ -99,7 +98,6 @@ export class LeagueService {
         `,
         [week, season],
       );
-      console.log(query);
       for (let q = 0; q < query.length; q++) {
         const team = query[q].team;
         const diff = query[q].diff;
@@ -164,7 +162,6 @@ export class LeagueService {
           `,
           [week, team, season],
         );
-        console.log(query);
         return query;
       }
     } catch (error) {

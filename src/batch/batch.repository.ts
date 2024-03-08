@@ -32,7 +32,7 @@ export class BatchRepository extends Repository<Batch> {
         `,
         [week],
       );
-      console.log(dates);
+      Logger.log(`DATES: ${dates}`);
       return dates;
     } catch (error) {
       Logger.error(`ERROR GETTING DATES FOR WEEK: ${error}`);
@@ -40,9 +40,8 @@ export class BatchRepository extends Repository<Batch> {
   }
 
   async batchJobData(jobType: JobType, jobStatus: JobStatus): Promise<void> {
-    console.log(jobType, jobStatus);
+    Logger.log(`${jobType} completed, logging status ${jobStatus} to DB`);
     try {
-      console.log('REPO LEVEL!! ***** ' + jobStatus);
       const batch = this.create({
         job_type: jobType,
         job_status: jobStatus,

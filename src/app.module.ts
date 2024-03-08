@@ -30,7 +30,7 @@ import { SubsModule } from './subs/subs.module';
       entities: ['dist/**/**/*.entity.js'],
       autoLoadEntities: true,
       migrationsRun: true,
-      synchronize: true,
+      synchronize: false,
       logging: true,
     }),
     SubsModule,

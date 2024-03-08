@@ -27,21 +27,18 @@ export class PicksRepository extends Repository<Picks> {
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
     try {
       const { week, pick, subleague_id } = makePicksDto;
-      console.log(week);
       const checkPicks = await this.query(`
       SELECT week, pick
       FROM picks
       WHERE "userId" = '${user.id}'
       AND league_id = '${subleague_id}'
       `);
-      console.log(checkPicks);
       const uniqueCheck = checkPicks.map(
         (p: any) => p.week === week || p.pick === pick,
       );
       if (uniqueCheck.includes(true)) {
         throw new ConflictException('Week or Team are Not Unique!');
       }
-      console.log(uniqueCheck);
       const pickId = await getPickId(user);
       const userPick = this.create({
         pickId,
