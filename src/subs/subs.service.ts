@@ -14,6 +14,8 @@ import { JoinLeagueDto } from './dto/join-league.dto';
 import { UpdateLeagueDto } from './dto/update-league.dto';
 import { generatePasscode } from '../utils/globals';
 import { Role } from '../auth/enums/roles.enum';
+import { BatchRepository } from '../batch/batch.repository';
+import { format } from 'date-fns';
 
 @Injectable()
 export class SubsService {
@@ -22,6 +24,8 @@ export class SubsService {
     private subsRepository: SubsRepository,
     @InjectRepository(SubsUsersRepository)
     private subsUsersRepository: SubsUsersRepository,
+    @InjectRepository(BatchRepository)
+    private batchRepository: BatchRepository,
   ) {}
   async createLeague(
     createLeagueDto: CreateLeagueDto,
@@ -62,7 +66,10 @@ export class SubsService {
     }
   }
 
-  async joinLeague(joinLeagueDto: JoinLeagueDto, user: User): Promise<string> {
+  async joinLeague(
+    joinLeagueDto: JoinLeagueDto,
+    user: User,
+  ): Promise<SubLeagues> {
     const { passcode } = joinLeagueDto;
     try {
       const leagueInfo = await this.subsRepository.query(
@@ -104,7 +111,7 @@ export class SubsService {
           );
         }
       }
-      return 'SUCCESS JOINING LEAGUE!';
+      return leagueInfo;
     } catch (error) {
       throw new NotFoundException(
         `League with passcode ${passcode} not found.  Check the code and try again`,
@@ -114,18 +121,31 @@ export class SubsService {
 
   async getLeagueBySubId(id: string): Promise<SubLeagues> {
     try {
-      const leagues = await this.subsRepository.query(
+      let leagues = await this.subsRepository.query(
         `
-        SELECT passcode, league_id, league_name, active, game_mode
-        FROM sub_leagues
-        WHERE league_id = '${id}'
+        SELECT p."userId", p.league_id, p.active, u.username,u.email,i.week,i.pick,i.run_diff as weekly_diff, COALESCE(i.league_id, 'NA'), p.run_diff as league_diff,p.league_role as role, p.active,l.passcode
+        FROM subleague_players as p
+        JOIN sub_leagues as l ON p.league_id=l.league_id
+        JOIN public.user as u ON p."userId"=u.id
+        LEFT JOIN picks as i ON p."userId"=i."userId"
+        WHERE p.league_id = '${id}'
+        AND i.league_id = '${id}'
+        ORDER BY league_diff DESC;
         `,
       );
       if (leagues.length === 0) {
-        throw new Error(`No League with ID ${id}`);
-      } else {
-        return leagues;
+        leagues = await this.subsRepository.query(
+          `
+          SELECT p."userId", p.league_id, p.active, u.username,u.email, p.run_diff as league_diff,p.league_role as role, p.active,l.passcode
+          FROM subleague_players as p
+          JOIN sub_leagues as l ON p.league_id=l.league_id
+          JOIN public.user as u ON p."userId"=u.id
+          WHERE p.league_id = '${id}'
+          ORDER BY league_diff DESC;
+          `,
+        );
       }
+      return leagues;
     } catch (error) {
       Logger.error(error);
       throw new NotFoundException(`No League with ID ${id}`);
@@ -177,7 +197,9 @@ export class SubsService {
             : await generatePasscode()
         }', passcode),
         league_name = COALESCE('${
-          leagueName === undefined ? existingLeague[0].league_name : leagueName
+          leagueName === undefined || null
+            ? existingLeague[0].league_name
+            : leagueName
         }', league_name),
         active = COALESCE(${
           active === undefined ? existingLeague[0].active : active
@@ -190,7 +212,19 @@ export class SubsService {
         }', reg_status)
         WHERE league_id = '${id}';      
         `);
-        Logger.log(`League ${id} successfully updated.`);
+        Logger.log(`League ${id} successfully updated Subleagues Table.`);
+        await this.subsRepository.query(
+          `
+          UPDATE subleague_players
+          SET
+          league_name = COALESCE('${
+            leagueName === undefined || null
+              ? existingLeague[0].league_name
+              : leagueName
+          }', league_name)
+          WHERE league_id = '${id}';  
+          `,
+        );
         return `League updated!`;
       }
     } catch (error) {

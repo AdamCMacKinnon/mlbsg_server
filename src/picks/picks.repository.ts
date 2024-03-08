@@ -1,4 +1,4 @@
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import { ConflictException, Logger } from '@nestjs/common';
 import { User } from '../auth/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { MakePicksDto } from './dto/make-picks.dto';
@@ -25,9 +25,23 @@ export class PicksRepository extends Repository<Picks> {
     }
   }
   async makePicks(makePicksDto: MakePicksDto, user: User): Promise<Picks> {
-    // temp subleague value: d730ee25-08bd-408c-9536-000a6e39148c
     try {
       const { week, pick, subleague_id } = makePicksDto;
+      console.log(week);
+      const checkPicks = await this.query(`
+      SELECT week, pick
+      FROM picks
+      WHERE "userId" = '${user.id}'
+      AND league_id = '${subleague_id}'
+      `);
+      console.log(checkPicks);
+      const uniqueCheck = checkPicks.map(
+        (p: any) => p.week === week || p.pick === pick,
+      );
+      if (uniqueCheck.includes(true)) {
+        throw new ConflictException('Week or Team are Not Unique!');
+      }
+      console.log(uniqueCheck);
       const pickId = await getPickId(user);
       const userPick = this.create({
         pickId,
@@ -42,13 +56,11 @@ export class PicksRepository extends Repository<Picks> {
       );
       await this.save(userPick);
       return userPick;
-    } catch (error) {
+    } catch (error: any) {
       Logger.error(
-        `An ERROR OCCURED WHILE MAKING PICK FOR ${user.id}: ${error}`,
+        `An ERROR OCCURED WHILE MAKING PICK FOR ${user.id}: ${error.message}`,
       );
-      throw new InternalServerErrorException(
-        `Error While Saving User Picks.  Contact Support or Try Again`,
-      );
+      return error;
     }
   }
 }

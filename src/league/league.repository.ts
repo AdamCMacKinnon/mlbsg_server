@@ -1,6 +1,7 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { League } from './league.entity';
 import { Logger } from '@nestjs/common';
+import { UpdateFlag } from '../batch/enum/updateFlag.enum';
 
 @EntityRepository(League)
 export class LeagueRepository extends Repository<League> {
@@ -47,53 +48,64 @@ export class LeagueRepository extends Repository<League> {
     }
   }
 
-  async updateUserDiff(
+  async updateUsers(
+    /**
+     * Possible here to create an argument that delinates what type of update we're doing?
+     * Daily = update user diffs at the league level
+     * weekly = update user diffs and career numbers
+     * Could use different batch jobs to call the same method in the service.  Cuts down on clutter that way.
+     */
     diff: number,
     team: string,
     week: number,
     season: string,
+    updateFlag: UpdateFlag,
   ): Promise<void> {
     try {
-      await this.query(
-        `
-            UPDATE picks
-            SET run_diff = $1
-            WHERE pick = $2
-            AND week = $3
-            AND season = $4
+      /**
+       * Switch statement reads the update flag and determines which query to run.
+       * realtime_diff = updates picks table with run diff every 5 mins after 9AM
+       * status = flips players from active to inactive once a week if diff is less than 1
+       * weekly_diff = once a week, Mondays at 5am, aggregates diff from previous week to existing run_diff on subleague_players table
+       */
+      switch (updateFlag) {
+        case UpdateFlag.realtime_diff:
+          await this.query(
+            `
+                UPDATE picks
+                SET run_diff = $1
+                WHERE pick = $2
+                AND week = $3
+                AND season = $4
+                `,
+            [diff, team, week, season],
+          );
+          break;
+        case UpdateFlag.status:
+          await this.query(
+            `
+            UPDATE subleague_players
+            SET active = false
+            WHERE run_diff >= 0
             `,
-        [diff, team, week, season],
-      );
-      if (diff > 0) {
-        await this.query(
-          `
-          UPDATE public.user AS u
-          SET diff = diff + $1, 
-            career_diff = career_diff + $1
-          FROM picks AS p
-          WHERE p."userId" = u.id
-            AND u.isactive = true
-            AND p.pick = $2
-            AND p.week = $3
-            AND p.season = $4
-          `,
-          [diff, team, week, season],
-        );
-      } else {
-        await this.query(
-          `
-          UPDATE public.user AS u
-          SET diff = diff + $1, 
-            isactive = false, 
-            career_diff = career_diff + $1
-          FROM picks AS p
-          WHERE p."userId" = u.id
-            AND p.pick = $2
-            AND p.week = $3
-            AND p.season = $4
-          `,
-          [diff, team, week, season],
-        );
+          );
+          break;
+        case UpdateFlag.weekly_diff:
+          await this.query(
+            `
+              UPDATE subleague_players as s
+              SET run_diff = run_diff + $1
+              FROM picks AS p
+              WHERE p."userId" = s."userId"
+                AND p.pick = $2
+                AND p.week = $3
+                AND p.season = $4
+              `,
+            [diff, team, week, season],
+          );
+          break;
+        default:
+          Logger.warn('DEFAULT SWITCH CASE IN UPDATE FLAG');
       }
     } catch (error) {
       Logger.error(`Error updating user diff: ${error}`);

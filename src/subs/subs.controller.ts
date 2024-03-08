@@ -34,7 +34,7 @@ export class SubsController {
   joinLeague(
     @Body() joinLeagueDto: JoinLeagueDto,
     @GetUser() user: User,
-  ): Promise<string> {
+  ): Promise<SubLeagues> {
     return this.subsService.joinLeague(joinLeagueDto, user);
   }
   @Get('/leagues/:id')
@@ -45,14 +45,9 @@ export class SubsController {
   getLeaguesByUserId(@Param('id') id: string): Promise<SubLeagues[]> {
     return this.subsService.getLeagueByUserId(id);
   }
-  /**
-   * Role Guards need to be put in place here before prod launch.
-   * For now, anyone can update, however we need to move roles from USER table to exclusively SUBLEAGUE table
-   * That will be a separate PR, delete this comment and uncomment guards in this file when complete.
-   */
   @Patch('/leagues/update/:id')
-  @UseGuards(RolesGuard)
-  @Roles(Role.commish, Role.admin)
+  // @UseGuards(RolesGuard)
+  // @Roles(Role.commish, Role.admin)
   updateLeagueInfo(
     @Param('id') id: string,
     @Body() updateLeagueDto: UpdateLeagueDto,
