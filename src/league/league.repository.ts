@@ -86,7 +86,7 @@ export class LeagueRepository extends Repository<League> {
             `
             UPDATE subleague_players
             SET active = false
-            WHERE run_diff >= 0
+            WHERE run_diff <= 0
             `,
           );
           break;
