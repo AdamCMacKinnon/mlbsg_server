@@ -113,62 +113,62 @@ export class BatchService {
     }
   }
 
-  @Cron('0 5 * * 1', {
-    name: 'user_weekly_diff_update',
-    timeZone: 'America/New_York',
-  })
-  async updateWeeklyUserDiff() {
-    try {
-      const jobType = JobType.user_weekly_diff_update;
-      const updateFlag = UpdateFlag.weekly_diff;
-      const date = format(subDays(new Date(), 1), 'yyyy-LL-dd');
-      const week = await this.batchRepository.getWeekQuery(date);
-      const weeklyUserUpdate = await this.leagueService.updateUserJobs(
-        week,
-        updateFlag,
-      );
-      const weeklyDiffUpdate = this.schedulerRegistry.getCronJob(
-        'user_weekly_diff_update',
-      );
-      weeklyDiffUpdate.start();
-      const jobStatus =
-        weeklyUserUpdate.length <= 0 ? JobStatus.blank : JobStatus.success;
-      await this.batchRepository.batchJobData(jobType, jobStatus);
-    } catch (error) {
-      Logger.error('ERROR IN WEEKLY USER UPDATE **** ' + error);
-      const jobStatus = JobStatus.failure;
-      const jobType = JobType.user_diff_update;
-      await this.batchRepository.batchJobData(jobType, jobStatus);
-      await this.emailService.batchAlert(jobType);
-    }
-  }
+  // @Cron('0 5 * * 1', {
+  //   name: 'user_weekly_diff_update',
+  //   timeZone: 'America/New_York',
+  // })
+  // async updateWeeklyUserDiff() {
+  //   try {
+  //     const jobType = JobType.user_weekly_diff_update;
+  //     const updateFlag = UpdateFlag.weekly_diff;
+  //     const date = format(subDays(new Date(), 1), 'yyyy-LL-dd');
+  //     const week = await this.batchRepository.getWeekQuery(date);
+  //     const weeklyUserUpdate = await this.leagueService.updateUserJobs(
+  //       week,
+  //       updateFlag,
+  //     );
+  //     const weeklyDiffUpdate = this.schedulerRegistry.getCronJob(
+  //       'user_weekly_diff_update',
+  //     );
+  //     weeklyDiffUpdate.start();
+  //     const jobStatus =
+  //       weeklyUserUpdate.length <= 0 ? JobStatus.blank : JobStatus.success;
+  //     await this.batchRepository.batchJobData(jobType, jobStatus);
+  //   } catch (error) {
+  //     Logger.error('ERROR IN WEEKLY USER UPDATE **** ' + error);
+  //     const jobStatus = JobStatus.failure;
+  //     const jobType = JobType.user_diff_update;
+  //     await this.batchRepository.batchJobData(jobType, jobStatus);
+  //     await this.emailService.batchAlert(jobType);
+  //   }
+  // }
 
   /**
    * UpdateUserStatus job runs once a week, 7am on Mondays
    * Checks user diff, if it's less than or equal to zero
    * set active to false
    */
-  @Cron('0 7 * * 1', {
-    name: 'update_user_status',
-    timeZone: 'America/New_York',
-  })
-  async updateUserStatus() {
-    const jobType = JobType.user_status_update;
-    const updateFlag = UpdateFlag.status;
-    const date = format(endOfYesterday(), 'yyyy-LL-dd');
-    const week = await this.batchRepository.getWeekQuery(date);
-    const statusUpdate = await this.leagueService.updateUserJobs(
-      week,
-      updateFlag,
-    );
-    const userStatus = await this.schedulerRegistry.getCronJob(
-      'user_status_update',
-    );
-    userStatus.start();
-    const jobStatus =
-      statusUpdate.length <= 0 ? JobStatus.blank : JobStatus.success;
-    await this.batchRepository.batchJobData(jobType, jobStatus);
-  }
+  // @Cron('0 7 * * 1', {
+  //   name: 'update_user_status',
+  //   timeZone: 'America/New_York',
+  // })
+  // async updateUserStatus() {
+  //   const jobType = JobType.user_status_update;
+  //   const updateFlag = UpdateFlag.status;
+  //   const date = format(endOfYesterday(), 'yyyy-LL-dd');
+  //   const week = await this.batchRepository.getWeekQuery(date);
+  //   const statusUpdate = await this.leagueService.updateUserJobs(
+  //     week,
+  //     updateFlag,
+  //   );
+  //   const userStatus = await this.schedulerRegistry.getCronJob(
+  //     'user_status_update',
+  //   );
+  //   userStatus.start();
+  //   const jobStatus =
+  //     statusUpdate.length <= 0 ? JobStatus.blank : JobStatus.success;
+  //   await this.batchRepository.batchJobData(jobType, jobStatus);
+  // }
 
   /**
    * EMAIL CRON JOBS
