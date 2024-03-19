@@ -23,19 +23,35 @@ export class BatchRepository extends Repository<Batch> {
   }
 
   async getDatesForWeek(week: number) {
+    const nextWeek = week + 1;
     try {
       const dates = await this.query(
         `
         SELECT *
         FROM schedule_weeks
-        WHERE week = $1
+        WHERE week IN ($1, $2)
         `,
-        [week],
+        [week, nextWeek],
       );
       Logger.log(`DATES: ${dates}`);
       return dates;
     } catch (error) {
       Logger.error(`ERROR GETTING DATES FOR WEEK: ${error}`);
+    }
+  }
+
+  async getAllWeeksForClient() {
+    try {
+      const allWeeks = await this.query(
+        `
+        SELECT *
+        FROM schedule_weeks
+        `,
+      );
+      return allWeeks;
+    } catch (error) {
+      Logger.error(`ERROR GETTING ALL WEEKS: ${error}`);
+      return error;
     }
   }
 
