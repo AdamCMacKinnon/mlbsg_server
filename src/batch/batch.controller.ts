@@ -14,8 +14,4 @@ export class BatchController {
   ): Promise<any> {
     return this.batchRepository.getDatesForWeek(week);
   }
-  @Get('/getallweeks')
-  getAllWeeksForClient(): Promise<any> {
-    return this.batchRepository.getAllWeeksForClient();
-  }
 }
